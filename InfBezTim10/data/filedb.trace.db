@@ -1,0 +1,6 @@
+2023-03-14 14:11:55 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ADMINISTRATOR" not found; SQL statement:
+INSERT INTO Administrator (id) values ( 1 ) [42102-214]
+2023-03-14 14:12:22 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "ADMINISTRATOR" not found; SQL statement:
+INSERT INTO Administrator (id) values ( 1 ) [42102-214]
