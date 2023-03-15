@@ -1,5 +1,6 @@
 package com.example.InfBezTim10.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,9 +28,15 @@ import static org.springframework.http.HttpMethod.POST;
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
 
+    private final JwtAuthFilter jwtAuthFilter;
+
     private final UserDetailsService userDetailsService;
 
-    public SecurityConfig(UserDetailsService userDetailsService) {
+    @Autowired
+    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter, UserDetailsService userDetailsService) {
+        this.jwtAuthFilter = jwtAuthFilter;
         this.userDetailsService = userDetailsService;
     }
 
@@ -39,6 +46,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(toH2Console()).permitAll()
                 .requestMatchers(GET, "/api/user/foo").permitAll()
+                .requestMatchers(POST, "/api/user/login").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -46,7 +54,10 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider())
-                .exceptionHandling();
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint(restAuthenticationEntryPoint);
+        ;
 
 
         http.headers().frameOptions().sameOrigin();
