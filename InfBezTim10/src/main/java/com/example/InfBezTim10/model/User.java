@@ -1,25 +1,17 @@
 package com.example.InfBezTim10.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import static jakarta.persistence.InheritanceType.JOINED;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Entity
+@Table(name = "users")
+@Inheritance(strategy=JOINED)
 @Getter
 @Setter
-@Entity
-@Inheritance(strategy=JOINED)
-@Table(name = "users")
-public abstract class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
+public abstract class User extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -39,6 +31,17 @@ public abstract class User {
     @JoinColumn(name = "authority_id")
     private Authority authority;
 
-    @Column(name="is_active")
-    private boolean isActive;
+    protected User() {
+        super();
+    }
+
+    public User(String name, String surname, String email, String password, String telephoneNumber, Authority authority) {
+        this();
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+        this.telephoneNumber = telephoneNumber;
+        this.authority = authority;
+    }
 }
