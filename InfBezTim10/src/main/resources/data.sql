@@ -6,4 +6,4 @@ VALUES ('ROLE_USER');
 
 INSERT INTO users(name, surname, email, password, telephone_number, authority_id, is_active)
 VALUES ('Admin', 'Admin', 'admin@gmail.com', 'admin123', '+381611667584', '1' , true);
-INSERT INTO Admin (id) values ( 1 );
+INSERT INTO Admin (id) values (1);
