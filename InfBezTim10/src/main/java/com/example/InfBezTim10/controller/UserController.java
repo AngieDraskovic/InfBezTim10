@@ -16,13 +16,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
     private final IUserService userService;
-
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
 
@@ -31,12 +31,6 @@ public class UserController {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
-    }
-
-    @GetMapping(value = "/foo")
-    public ResponseEntity<?> foo()
-    {
-        return ResponseEntity.status(HttpStatus.OK).body("bar");
     }
 
     @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
