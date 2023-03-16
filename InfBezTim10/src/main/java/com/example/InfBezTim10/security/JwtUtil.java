@@ -1,6 +1,6 @@
 package com.example.InfBezTim10.security;
 
-import com.example.InfBezTim10.service.implementation.UserService;
+import com.example.InfBezTim10.service.IUserService;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -19,9 +19,13 @@ public class JwtUtil {
     private Integer tokenValidity = 3600 * 24;
     private String SECRET_KEY = "secret";
     private String authoritiesKey = "role";
+    private final IUserService userService;
+
 
     @Autowired
-    private UserService userService;
+    public JwtUtil(IUserService userService) {
+        this.userService = userService;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
