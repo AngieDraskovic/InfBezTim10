@@ -9,11 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 @Table(name = "authority")
 @Getter
 @Setter
-public class Authority implements GrantedAuthority {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class Authority extends BaseEntity implements GrantedAuthority {
 
     @Column(name = "authority_name", nullable = false, unique = true)
     private String authorityName;

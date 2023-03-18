@@ -4,7 +4,11 @@ package com.example.InfBezTim10.controller;
 import com.example.InfBezTim10.dto.AuthTokenDTO;
 import com.example.InfBezTim10.dto.ResponseMessageDTO;
 import com.example.InfBezTim10.dto.UserCredentialsDTO;
+import com.example.InfBezTim10.dto.UserDTORequest;
+import com.example.InfBezTim10.model.AuthorityEnum;
+import com.example.InfBezTim10.model.User;
 import com.example.InfBezTim10.security.JwtUtil;
+import com.example.InfBezTim10.service.IAuthorityService;
 import com.example.InfBezTim10.service.IUserService;
 import com.example.InfBezTim10.service.implementation.UserService;
 import jakarta.validation.Valid;
@@ -16,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,12 +29,15 @@ public class UserController {
     private final IUserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-
+    private final IAuthorityService authorityService;
+    private PasswordEncoder passwordEncoder;
     @Autowired
-    public UserController(UserService userService, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager, JwtUtil jwtUtil, IAuthorityService authorityService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.authorityService = authorityService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,4 +58,22 @@ public class UserController {
         }
     }
 
+    @PostMapping(value="/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE )
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserDTORequest userDTO){
+        if(userService.findByEmail(userDTO.getEmail())!=null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO( "User with given email already exists!"));
+        }
+        User user = new User();
+        user.setName(userDTO.getName());
+        user.setEmail(userDTO.getEmail());
+        user.setSurname(userDTO.getSurname());
+        user.setTelephoneNumber(userDTO.getTelephoneNumber());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        // samo se obicni korisnici mogu registrovati
+        user.setAuthority(authorityService.getAuthority(AuthorityEnum.USER));
+        userService.save(user);
+
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+
+    }
 }
