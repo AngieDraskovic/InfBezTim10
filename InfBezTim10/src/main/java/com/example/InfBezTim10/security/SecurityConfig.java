@@ -44,10 +44,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .authorizeHttpRequests()
+                .authorizeRequests()
                 .requestMatchers(toH2Console()).permitAll()
                 .requestMatchers(GET, "/api/user/foo").permitAll()
                 .requestMatchers(POST, "/api/user/login").permitAll()
+                .requestMatchers(POST, "/api/user/register").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

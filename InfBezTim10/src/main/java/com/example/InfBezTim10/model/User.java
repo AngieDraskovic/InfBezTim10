@@ -11,7 +11,7 @@ import static jakarta.persistence.InheritanceType.JOINED;
 @Inheritance(strategy=JOINED)
 @Getter
 @Setter
-public abstract class User extends BaseEntity {
+public class User extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -31,7 +31,7 @@ public abstract class User extends BaseEntity {
     @JoinColumn(name = "authority_id")
     private Authority authority;
 
-    protected User() {
+    public User() {
         super();
     }
 
