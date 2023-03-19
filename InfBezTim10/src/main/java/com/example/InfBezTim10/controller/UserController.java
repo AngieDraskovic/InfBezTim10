@@ -1,10 +1,7 @@
 package com.example.InfBezTim10.controller;
 
 
-import com.example.InfBezTim10.dto.AuthTokenDTO;
-import com.example.InfBezTim10.dto.ResponseMessageDTO;
-import com.example.InfBezTim10.dto.UserCredentialsDTO;
-import com.example.InfBezTim10.dto.UserDTORequest;
+import com.example.InfBezTim10.dto.*;
 import com.example.InfBezTim10.model.AuthorityEnum;
 import com.example.InfBezTim10.model.User;
 import com.example.InfBezTim10.security.JwtUtil;
@@ -72,8 +69,8 @@ public class UserController {
         // samo se obicni korisnici mogu registrovati
         user.setAuthority(authorityService.getAuthority(AuthorityEnum.USER));
         userService.save(user);
-
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+        UserDTODetails userDTODetails = new UserDTODetails(user);
+        return ResponseEntity.status(HttpStatus.OK).body(userDTODetails);
 
     }
 }
