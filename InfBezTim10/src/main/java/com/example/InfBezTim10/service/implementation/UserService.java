@@ -3,8 +3,13 @@ package com.example.InfBezTim10.service.implementation;
 import com.example.InfBezTim10.model.User;
 import com.example.InfBezTim10.repository.IUserRepository;
 import com.example.InfBezTim10.service.IUserService;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,7 +28,7 @@ public class UserService extends JPAService<User> implements IUserService, UserD
     }
 
     @Override
-    protected JpaRepository<User, Long> getEntityRepository() {
+    protected MongoRepository<User, String> getEntityRepository() {
         return this.userRepository;
     }
 

@@ -1,7 +1,9 @@
 package com.example.InfBezTim10.model;
 
-import jakarta.persistence.Entity;
+import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-public class Admin extends User{
+@TypeAlias("admin")
+@Document(collection = "users")
+public class Admin {
 }

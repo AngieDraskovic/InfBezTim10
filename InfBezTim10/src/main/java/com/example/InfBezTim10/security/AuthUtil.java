@@ -15,9 +15,9 @@ public class AuthUtil {
         this.userService = userService;
     }
 
-    public boolean hasRole (String roleName)
-    {
+    public boolean hasRole(String roleName) {
         return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(roleName));
     }
 }
+

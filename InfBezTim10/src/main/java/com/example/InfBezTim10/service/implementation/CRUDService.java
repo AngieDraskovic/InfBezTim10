@@ -5,14 +5,14 @@ import com.example.InfBezTim10.model.BaseEntity;
 import com.example.InfBezTim10.service.ICRUDService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
 @Transactional
 public abstract class CRUDService<T extends BaseEntity> implements ICRUDService<T> {
 
-    protected abstract JpaRepository<T, Long> getEntityRepository();
+    protected abstract MongoRepository<T, String> getEntityRepository();
 
     @Override
     public List<T> findAll() {
@@ -20,7 +20,7 @@ public abstract class CRUDService<T extends BaseEntity> implements ICRUDService<
     }
 
     @Override
-    public T findById(Long id) throws EntityNotFoundException {
+    public T findById(String id) throws EntityNotFoundException {
         return findEntityChecked(id);
     }
 
@@ -35,12 +35,12 @@ public abstract class CRUDService<T extends BaseEntity> implements ICRUDService<
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(String id) {
         var entity = findEntityChecked(id);
         entity.setActive(false);
     }
 
-    private T findEntityChecked(Long id) throws EntityNotFoundException {
+    private T findEntityChecked(String id) throws EntityNotFoundException {
         var entity = getEntityRepository().findById(id).orElseThrow(() -> new NotFoundException("Cannot find entity with id: " + id));
         if (Boolean.TRUE.equals(entity.getActive())) {
             return entity;

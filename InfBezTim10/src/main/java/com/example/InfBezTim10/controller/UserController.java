@@ -1,7 +1,7 @@
 package com.example.InfBezTim10.controller;
 
-
 import com.example.InfBezTim10.dto.*;
+import com.example.InfBezTim10.model.Authority;
 import com.example.InfBezTim10.model.AuthorityEnum;
 import com.example.InfBezTim10.model.User;
 import com.example.InfBezTim10.security.JwtUtil;
@@ -18,7 +18,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/user")
@@ -27,7 +30,8 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final IAuthorityService authorityService;
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
     public UserController(UserService userService, AuthenticationManager authenticationManager, JwtUtil jwtUtil, IAuthorityService authorityService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
@@ -56,7 +60,7 @@ public class UserController {
     }
 
     @PostMapping(value="/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE )
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserDTORequest userDTO){
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRequestDTO userDTO){
         if(userService.findByEmail(userDTO.getEmail())!=null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO( "User with given email already exists!"));
         }
@@ -69,7 +73,7 @@ public class UserController {
         // samo se obicni korisnici mogu registrovati
         user.setAuthority(authorityService.getAuthority(AuthorityEnum.USER));
         userService.save(user);
-        UserDTODetails userDTODetails = new UserDTODetails(user);
+        UserDetailsDTO userDTODetails = new UserDetailsDTO(user);
         return ResponseEntity.status(HttpStatus.OK).body(userDTODetails);
 
     }

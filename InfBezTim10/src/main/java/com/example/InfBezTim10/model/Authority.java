@@ -1,17 +1,17 @@
 package com.example.InfBezTim10.model;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 
-@Entity
-@Table(name = "authority")
+@Document(collection = "authorities")
 @Getter
 @Setter
 public class Authority extends BaseEntity implements GrantedAuthority {
 
-    @Column(name = "authority_name", nullable = false, unique = true)
+    @Indexed(unique = true)
     private String authorityName;
 
     public Authority() {
