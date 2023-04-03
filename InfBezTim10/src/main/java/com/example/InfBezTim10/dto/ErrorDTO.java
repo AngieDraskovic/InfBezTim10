@@ -1,13 +1,15 @@
-package com.example.InfBezTim10.exception;
+package com.example.InfBezTim10.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class ErrorDTO {
     private HttpStatus status;
     private String message;

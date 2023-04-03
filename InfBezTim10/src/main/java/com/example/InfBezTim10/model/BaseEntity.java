@@ -1,23 +1,18 @@
 package com.example.InfBezTim10.model;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
+import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
 
-@MappedSuperclass
 @Getter
 @Setter
-@Where(clause = "active = true")
 public abstract class BaseEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(name = "is_active", nullable = false)
     private Boolean active;
 
     public BaseEntity() {
@@ -25,3 +20,4 @@ public abstract class BaseEntity implements Serializable {
     }
 
 }
+
