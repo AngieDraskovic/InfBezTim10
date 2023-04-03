@@ -12,15 +12,15 @@ import org.hibernate.validator.constraints.Length;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserRequestDTO {
-    @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "Field email format is not valid!")
-    private String email;
-
+public class UserRegistrationDTO {
     @Length(min = 3, max = 20)
     private String name;
 
     @Length(min = 3, max = 20)
     private String surname;
+
+    @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", message = "Field email format is not valid!")
+    private String email;
 
     @Size(min = 5, max = 30, message = "Field telephoneNumber is not valid!")
     private String telephoneNumber;
