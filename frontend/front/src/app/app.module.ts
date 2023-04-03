@@ -38,15 +38,18 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegistrationComponent } from './components/registration/registration.component';
-
+import { FirstPageComponent } from './components/first-page/first-page.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    RegistrationComponent
+    RegistrationComponent,
+    FirstPageComponent
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     CdkTreeModule,
     MatAutocompleteModule,
@@ -82,6 +85,7 @@ import { RegistrationComponent } from './components/registration/registration.co
     MatDatepickerModule,
     MatTooltipModule
   ],
+  exports:[LoginComponent], 
   providers: [],
   bootstrap: [AppComponent]
 })

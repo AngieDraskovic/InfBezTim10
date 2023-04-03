@@ -1,10 +1,8 @@
-<div class="text-center">
-    <h4 class="text-center"> Login form with Validation using Angular Material</h4>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate class="d-flex-center">
-      <div class="example-container">
+<mat-card>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
         <div>
-          <mat-form-field>
-            <input matInput placeholder="Email" formControlName="email">
+          <mat-form-field id="formField">
+            <input matInput placeholder="Email" formControlName="email" id="inputField">
             <mat-error *ngIf="!loginForm.get('email')?.errors?.required && (loginForm.get('email')?.errors?.pattern)">
               Please enter a valid email address
             </mat-error>
@@ -13,9 +11,9 @@
             </mat-error>
           </mat-form-field>
         </div>
-        <div class="mt-top-2">
-          <mat-form-field>
-            <input matInput type="password" placeholder="Password" formControlName="password">    
+        <div>
+          <mat-form-field id="formField">
+            <input matInput type="password" placeholder="Password" formControlName="password" id="inputField">    
             <mat-error *ngIf="!loginForm.get('password')?.errors?.required">
               Password length must be greater than or equal to 8 and password must contain one or more uppercase , lowercase , numeric and special characters
             </mat-error>
@@ -24,10 +22,9 @@
             </mat-error>
           </mat-form-field>
         </div>
-        <div class="mt-top">
-          <button [disabled]="!loginForm.valid" mat-raised-button color="primary" mat-button>Sign In</button>
-        </div>
-      </div>
+        <a id="forgotLink">Forgot password?</a>
+        <br>
+        <button [disabled]="!loginForm.valid" mat-raised-button mat-button id="logBtn">Log In</button>
     </form>
-  </div>
+  </mat-card>
   
