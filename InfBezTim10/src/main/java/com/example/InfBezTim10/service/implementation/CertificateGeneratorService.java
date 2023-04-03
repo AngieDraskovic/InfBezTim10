@@ -1,34 +1,50 @@
 package com.example.InfBezTim10.service.implementation;
 
 import com.example.InfBezTim10.model.Certificate;
+import com.example.InfBezTim10.model.CertificateStatus;
+import com.example.InfBezTim10.model.CertificateType;
 import com.example.InfBezTim10.model.User;
 import com.example.InfBezTim10.repository.ICertificateRepository;
 import com.example.InfBezTim10.service.ICertificateGeneratorService;
 import com.example.InfBezTim10.service.IUserService;
+import com.example.InfBezTim10.utils.X509CertificateGeneratorUtils;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jcajce.provider.asymmetric.RSA;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.*;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class CertificateGeneratorService extends JPAService<Certificate> implements ICertificateGeneratorService {
@@ -36,9 +52,10 @@ public class CertificateGeneratorService extends JPAService<Certificate> impleme
     private final IUserService userService;
     private static String certDir = "certs";
     private Certificate issuer;
+    private X509Certificate issuerCertificate;
     private Date validTo;
     private User subject;
-    private KeyPair currentRSA;
+    private KeyPair currentKeyPair;
     private KeyUsage flags;
     private boolean isAuthority;
 
@@ -48,42 +65,91 @@ public class CertificateGeneratorService extends JPAService<Certificate> impleme
         this.userService = userService;
     }
 
-    public Certificate IssueCertificate(String issuerSN, String subjectUsername, String keyUsageFlags, Date validTo){
-        try {
-            Validate(issuerSN, subjectUsername, keyUsageFlags, validTo);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-//        var cert = GenerateCertificate();
-//
-//        return ExportGeneratedCertificate(cert);
-        return new Certificate();
+    public Certificate IssueCertificate(String issuerSN, String subjectUsername, String keyUsageFlags, Date validTo) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException,
+            SignatureException, IOException, InvalidKeySpecException, OperatorCreationException, Exception {
+        validate(issuerSN, subjectUsername, keyUsageFlags, validTo);
+        X509Certificate cert = generateCertificate();
+
+        return exportGeneratedCertificate(cert);
     }
 
-    private X509Certificate GenerateCertificate() throws NoSuchAlgorithmException {
-        String subjectText = String.format("CN=%s", subject.getEmail());
+    private Certificate exportGeneratedCertificate(X509Certificate cert) throws IOException, CertificateEncodingException {
+        Certificate certificateForDb = new Certificate();
+        certificateForDb.setIssuer(issuer != null ? issuer.getSerialNumber() : null);
+        certificateForDb.setStatus(CertificateStatus.VALID);
+        certificateForDb.setType(isAuthority
+                ? issuerCertificate == null ? CertificateType.ROOT : CertificateType.INTERMEDIATE
+                : CertificateType.END);
+        certificateForDb.setSerialNumber(cert.getSerialNumber().toString(16));
+        certificateForDb.setSignatureAlgorithm(cert.getSigAlgName());
+        certificateForDb.setUserEmail(subject.getName());
+        certificateForDb.setValidFrom(cert.getNotBefore());
+        certificateForDb.setValidTo(cert.getNotAfter());
+
+        certificateRepository.save(certificateForDb);
+
+        Files.write(Paths.get(certDir, certificateForDb.getSerialNumber() + ".crt"),
+                cert.getEncoded());
+        Files.write(Paths.get(certDir, certificateForDb.getSerialNumber() + ".key"),
+                currentKeyPair.getPrivate().getEncoded());
+
+        return certificateForDb;
+    }
+
+    private X509Certificate generateCertificate() throws CertificateException, NoSuchAlgorithmException, OperatorCreationException, IOException {
+        X500Name subjectText = new X500Name("CN=" + subject.getName());
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(4096);
-        currentRSA = keyPairGenerator.generateKeyPair();
+        keyPairGenerator.initialize(4096, new SecureRandom());
+        currentKeyPair = keyPairGenerator.generateKeyPair();
 
-        CertAndKeyGen certGen = new CertAndKeyGen("RSA", "SHA256WithRSA", null);
-        certGen.generate(4096);
-        X500Name x500Name = new X500Name(subjectText);
-        X509Certificate certificateRequest = certGen.getSelfCertificate(x500Name, validFrom.getTime(), validTo.getTime());
+        X509v3CertificateBuilder certificateBuilder;
+        if (issuerCertificate == null) {
+            certificateBuilder = new JcaX509v3CertificateBuilder(
+                    subjectText,
+                    new BigInteger(64, new SecureRandom()),
+                    new Date(),
+                    validTo,
+                    subjectText,
+                    currentKeyPair.getPublic());
+        } else {
+            certificateBuilder = new JcaX509v3CertificateBuilder(
+                    new X500Name(issuerCertificate.getSubjectX500Principal().getName()),
+                    new BigInteger(64, new SecureRandom()),
+                    new Date(),
+                    validTo,
+                    subjectText,
+                    currentKeyPair.getPublic());
+        }
 
-        var certificateRequest = new CertificateRequest(subjectText, currentRSA, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        addExtensions(certificateBuilder);
 
-        certificateRequest.CertificateExtensions.Add(new X509BasicConstraintsExtension(isAuthority, false, 0, true));
-        certificateRequest.CertificateExtensions.Add(new X509KeyUsageExtension(flags, false));
+        ContentSigner contentSigner;
+        if (issuerCertificate == null) {
+            contentSigner = new JcaContentSignerBuilder("SHA256WithRSAEncryption").build(currentKeyPair.getPrivate());
+        } else {
+            AsymmetricKeyParameter privateKeyParameter = PrivateKeyFactory.createKey(issuerCertificate.getPublicKey().getEncoded());
+            contentSigner = new JcaContentSignerBuilder("SHA256WithRSAEncryption").build((PrivateKey) privateKeyParameter);
+        }
 
-        var generatedCertificate = issuerCertificate == null
-                ? certificateRequest.CreateSelfSigned(DateTime.Now, validTo)
-                : certificateRequest.Create(issuerCertificate, DateTime.Now, validTo,
-                Guid.NewGuid().ToByteArray());
-        return generatedCertificate;
+        X509CertificateHolder certificateHolder = certificateBuilder.build(contentSigner);
+
+        return new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider()).getCertificate(certificateHolder);
     }
 
-    private void Validate(String issuerSN, String subjectUsername, String keyUsageFlags, Date validTo) throws Exception, GeneralSecurityException {
+    private void addExtensions(X509v3CertificateBuilder certificateBuilder) throws CertIOException, NoSuchAlgorithmException {
+        certificateBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(isAuthority));
+        certificateBuilder.addExtension(Extension.keyUsage, true, flags);
+        SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(currentKeyPair.getPublic().getEncoded());
+        certificateBuilder.addExtension(Extension.subjectKeyIdentifier, false, new JcaX509ExtensionUtils().createSubjectKeyIdentifier(publicKeyInfo));
+
+        if (issuerCertificate != null) {
+            SubjectPublicKeyInfo issuerPublicKeyInfo = SubjectPublicKeyInfo.getInstance(issuerCertificate.getPublicKey().getEncoded());
+            certificateBuilder.addExtension(Extension.authorityKeyIdentifier, false, new JcaX509ExtensionUtils().createAuthorityKeyIdentifier(issuerPublicKeyInfo));
+        }
+
+    }
+
+    private void validate(String issuerSN, String subjectUsername, String keyUsageFlags, Date validTo) throws Exception {
         if (issuerSN.isEmpty()) {
             if (!(validTo.after(new Date()))) {
                 throw new Exception("The date is not in the accepted range");
@@ -94,7 +160,7 @@ public class CertificateGeneratorService extends JPAService<Certificate> impleme
 
             X509Certificate issuerCertificate = readCertificateFromFile(String.format("%s/%s.crt", certDir, issuerSN));
             RSAPrivateKey privateKey = (RSAPrivateKey) getPrivateKeyFromBytes(String.format("%s/%s.key", certDir, issuerSN));
-            issuerCertificate = copyWithPrivateKey(issuerCertificate, privateKey);
+            issuerCertificate = X509CertificateGeneratorUtils.copyWithPrivateKey(issuerCertificate, privateKey);
 
             if (!(validTo.after(new Date()) && validTo.before(issuerCertificate.getNotAfter()))) {
                 throw new Exception("The date is not in the accepted range");
@@ -102,63 +168,31 @@ public class CertificateGeneratorService extends JPAService<Certificate> impleme
         }
         this.validTo = validTo;
         subject = userService.findByEmail(subjectUsername);
-        flags = new KeyUsage(parseFlags(keyUsageFlags));
+        flags = parseFlags(keyUsageFlags);
     }
 
-    private int parseFlags(String keyUsageFlags) throws Exception {
+    private KeyUsage parseFlags(String keyUsageFlags) {
         if (keyUsageFlags == null || keyUsageFlags.isEmpty()) {
-            throw new Exception("KeyUsageFlags are mandatory");
+            throw new IllegalArgumentException("KeyUsageFlags are mandatory");
         }
 
         String[] flagArray = keyUsageFlags.split(",");
         int retVal = 0;
 
-        Map<Integer, Integer> possibleElements = new HashMap<>();
-        possibleElements.put(0, KeyUsage.digitalSignature);
-        possibleElements.put(1, KeyUsage.nonRepudiation);
-        possibleElements.put(2, KeyUsage.keyEncipherment);
-        possibleElements.put(3, KeyUsage.dataEncipherment);
-        possibleElements.put(4, KeyUsage.keyAgreement);
-        possibleElements.put(5, KeyUsage.keyCertSign);
-        possibleElements.put(6, KeyUsage.cRLSign);
-        possibleElements.put(7, KeyUsage.encipherOnly);
-        possibleElements.put(8, KeyUsage.decipherOnly);
-
         for (String flag : flagArray) {
             try {
                 int index = Integer.parseInt(flag);
-                int currentFlag = possibleElements.get(index);
-                retVal |= currentFlag;
+                retVal |= 1 << index;
 
-                if (currentFlag == KeyUsage.keyCertSign){
+                if (index == 5) {
                     isAuthority = true;
                 }
             } catch (NumberFormatException e) {
-                throw new Exception("Unknown flag: " + flag);
+                throw new IllegalArgumentException("Unknown flag: " + flag, e);
             }
         }
 
-        return retVal;
-    }
-
-    public static X509Certificate copyWithPrivateKey(X509Certificate certificate, PrivateKey privateKey) throws Exception {
-        X500Name issuer = new X500Name(certificate.getIssuerX500Principal().getName());
-        X500Name subject = new X500Name(certificate.getSubjectX500Principal().getName());
-        RSAPublicKey publicKey = (RSAPublicKey) certificate.getPublicKey();
-
-        JcaX509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(
-                issuer,
-                certificate.getSerialNumber(),
-                certificate.getNotBefore(),
-                certificate.getNotAfter(),
-                subject,
-                publicKey
-        );
-
-        ContentSigner contentSigner = new JcaContentSignerBuilder(certificate.getSigAlgName()).build(privateKey);
-        X509CertificateHolder certificateHolder = certificateBuilder.build(contentSigner);
-
-        return new JcaX509CertificateConverter().getCertificate(certificateHolder);
+        return new KeyUsage(retVal);
     }
 
     public static PrivateKey getPrivateKeyFromBytes(String path) throws GeneralSecurityException {
