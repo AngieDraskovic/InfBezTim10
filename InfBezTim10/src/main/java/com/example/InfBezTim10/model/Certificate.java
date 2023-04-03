@@ -13,8 +13,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class Certificate extends BaseEntity {
-    @Id
-    public String id;
+
     @Indexed(unique = true)
     public String SerialNumber;
     public String SignatureAlgorithm;

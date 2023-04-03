@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -58,8 +59,9 @@ public class CertificateService extends JPAService<Certificate> implements ICert
     private final ICertificateRepository certificateRepository;
 
     @Autowired
-    public CertificateService(ICertificateRepository certificateRepository) {
+    public CertificateService(ICertificateRepository certificateRepository, IUserRepository userRepository) {
         this.certificateRepository = certificateRepository;
+        this.userRepository = userRepository;
     }
 
     public Certificate issueCertificate(String issuerSN, String subjectUsername, String keyUsageFlags, Date validTo)
@@ -86,6 +88,12 @@ public class CertificateService extends JPAService<Certificate> implements ICert
         certificateForDb.setValidTo(cert.getNotAfter());
 
         certificateRepository.save(certificateForDb);
+
+        // Create the "certs" directory if it does not exist
+        File certDirectory = new File(certDir);
+        if (!certDirectory.exists()) {
+            certDirectory.mkdir();
+        }
 
         Files.write(Paths.get(certDir, certificateForDb.getSerialNumber() + ".crt"),
                 cert.getEncoded());
