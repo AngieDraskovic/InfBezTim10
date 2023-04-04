@@ -21,7 +21,7 @@ public class CertificateConfig {
     private Certificate issuer;
     private X500Name subject;
     private boolean isAuthority;
-    private BigInteger serialNumber;
+    private BigInteger SerialNumber;
     private Date validFrom;
     private Date validTo;
     private KeyPair keyPair;

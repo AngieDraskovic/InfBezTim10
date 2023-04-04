@@ -2,6 +2,8 @@ package com.example.InfBezTim10.controller;
 
 import com.example.InfBezTim10.dto.CertificateDTO;
 import com.example.InfBezTim10.dto.CertificateRequestDTO;
+import com.example.InfBezTim10.dto.ResponseMessageDTO;
+import com.example.InfBezTim10.exception.CertificateNotFoundException;
 import com.example.InfBezTim10.mapper.CertificateMapper;
 import com.example.InfBezTim10.model.Certificate;
 import com.example.InfBezTim10.service.ICertificateGeneratorService;
@@ -12,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +46,7 @@ public class CertificateController {
         }
     }
 
+
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping()
     public ResponseEntity<List<CertificateDTO>> getAll() {
@@ -53,5 +57,16 @@ public class CertificateController {
         return ResponseEntity.status(HttpStatus.OK).body(certificateDTOS);
     }
 
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping(value="/validate/{serialNumber}")
+    public ResponseEntity<?> validate(@PathVariable("serialNumber") String serialNumber){
+        try {
+            boolean isValid = certificateService.validate(serialNumber);
+            return ResponseEntity.status(HttpStatus.OK).body(isValid);
+        }catch (CertificateNotFoundException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
+        }
+    }
 
 }

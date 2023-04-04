@@ -5,4 +5,5 @@ import com.example.InfBezTim10.model.User;
 
 public interface ICertificateService extends IJPAService<Certificate>{
     Certificate findBySerialNumber(String serialNumber);
+    boolean validate(String serialNumber);
 }
