@@ -13,8 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.Date;
 
 @Service
 public class CertificateRequestService extends MongoService<CertificateRequest>  implements ICertificateRequestService {
@@ -40,47 +41,7 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         return certificateRequestRepository.findBySubjectUsername(username);
     }
 
-    private static KeyUsage parseFlags(String keyUsageFlags) {
-        if (keyUsageFlags == null || keyUsageFlags.isEmpty()) {
-            throw new IllegalArgumentException("KeyUsageFlags are mandatory");
-        }
-        String[] flagArray = keyUsageFlags.split(",");
-        int retVal = 0;
-
-        for (String flag : flagArray) {
-            try {
-                int index = Integer.parseInt(flag);
-                retVal |= 1 << index;
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Unknown flag: " + flag, e);
-            }
-        }
-        return new KeyUsage(retVal);
-    }
-
-
-    private static CertificateType getCertificateType(String keyUsageString) {
-
-        KeyUsage keyUsage = parseFlags(keyUsageString);
-
-        int usageFlags = keyUsage.getBytes()[0]; // Get the byte array of the key usage flags and use the first byte
-
-        if ((usageFlags & KeyUsage.keyCertSign) != 0) {
-            return CertificateType.ROOT;
-        } else if ((usageFlags & KeyUsage.cRLSign) != 0) {
-            return CertificateType.INTERMEDIATE;
-        }
-
-        return CertificateType.END;
-    }
-
-
-
     public CertificateRequest createCertificateRequest(CertificateRequestDTO certificateRequestDTO, String userRole, String currentUserEmail) throws CertificateGenerationException {
-        // Validate the certificate type based on the user role
-        if (!userRole.equals("ROLE_ADMIN") && getCertificateType(certificateRequestDTO.getKeyUsageFlags()) == CertificateType.ROOT) {
-            throw new IllegalArgumentException("Only admins can request root certificates.");
-        }
 
         CertificateRequest certificateRequest = CertificateRequestMapper.INSTANCE.certificateRequestDTOToCertificateRequest(certificateRequestDTO);
 
@@ -90,7 +51,26 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         {
             // Fetch the certificate by its serial number
             Certificate issuerCertificate = certificateService.findBySerialNumber(certificateRequestDTO.getIssuerSN());
+
+            if (issuerCertificate.getType() == CertificateType.END){
+                throw new IllegalArgumentException("Can not issue certificate based on end certificate.");
+            }
+            if (issuerCertificate.getStatus() == CertificateStatus.INVALID){
+                throw new IllegalArgumentException("Can not issue certificate based on invalid certificate.");
+            }
+
+            Date currentDate = new Date();
+
+            if (currentDate.before(issuerCertificate.getValidFrom()) || currentDate.after(issuerCertificate.getValidTo())) {
+                throw new IllegalArgumentException("Can not issue certificate based on invalid certificate.");
+            }
+
             cerificateEmail = issuerCertificate.getUserEmail();
+        }
+
+        if(cerificateEmail.equals("") && !userRole.equals("ROLE_ADMIN"))
+        {
+            throw new IllegalArgumentException("Only admin can ask for root certificate.");
         }
 
         // Set status based on the rules mentioned in the task
@@ -131,7 +111,9 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         CertificateRequest request = certificateRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Certificate request not found"));
 
-        if (!request.getSubjectUsername().equals(username)) {
+        Certificate certificate = certificateService.findBySerialNumber(request.getIssuerSN());
+
+        if (!certificate.getUserEmail().equals(username)) {
             throw new IllegalArgumentException("User is not authorized to approve or reject this certificate request");
         }
 
