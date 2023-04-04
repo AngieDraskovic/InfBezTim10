@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 @Transactional
-public abstract class JPAService<T extends BaseEntity> extends CRUDService<T> implements IJPAService<T> {
+public abstract class MongoService<T extends BaseEntity> extends CRUDService<T> implements IJPAService<T> {
     @Override
     public Iterable<T> findAll(Sort sorter) {
         return getEntityRepository().findAll(sorter);
