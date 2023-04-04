@@ -131,9 +131,7 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         CertificateRequest request = certificateRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Certificate request not found"));
 
-        Certificate issuerCertificate = certificateService.findBySerialNumber(request.getIssuerSN());
-
-        if (!issuerCertificate.getUserEmail().equals(username)) {
+        if (!request.getSubjectUsername().equals(username)) {
             throw new IllegalArgumentException("User is not authorized to approve or reject this certificate request");
         }
 

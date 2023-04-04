@@ -61,8 +61,7 @@ public class CertificateRequestController {
         return ResponseEntity.ok(certificateRequestService.getCertificateRequestsByUser(principal.getName()));
     }
 
-    @PutMapping("/requests/{requestId}/approve")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PutMapping("/{requestId}/approve")
     public ResponseEntity<Certificate> approveCertificateRequest(@PathVariable String requestId, Principal principal) {
         try {
             return ResponseEntity.ok(certificateRequestService.approveCertificateRequest(requestId, principal.getName()));
@@ -72,8 +71,7 @@ public class CertificateRequestController {
         }
     }
 
-    @PutMapping("/requests/{requestId}/reject")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PutMapping("/{requestId}/reject")
     public ResponseEntity<Void> rejectCertificateRequest(
             @PathVariable String requestId,
             @RequestBody RejectionReasonDTO rejectionReasonDTO,
