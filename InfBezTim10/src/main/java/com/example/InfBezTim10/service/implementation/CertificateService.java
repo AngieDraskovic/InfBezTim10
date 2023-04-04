@@ -1,5 +1,4 @@
 package com.example.InfBezTim10.service.implementation;
-
 import com.example.InfBezTim10.exception.CertificateGenerationException;
 import com.example.InfBezTim10.model.*;
 import com.example.InfBezTim10.repository.ICertificateRepository;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
+
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -35,6 +35,7 @@ public class CertificateService extends JPAService<Certificate> implements ICert
     private final CertificateGenerator certificateGenerator;
     private final CertificateConfigValidator configValidator;
     private final IUserRepository userRepository;
+
 
     @Value("${cert.dir}")
     public static String certDir;
@@ -138,8 +139,8 @@ public class CertificateService extends JPAService<Certificate> implements ICert
         return new KeyUsage(retVal);
     }
 
-    @Override
     protected MongoRepository<Certificate, String> getEntityRepository() {
         return certificateRepository;
     }
+
 }

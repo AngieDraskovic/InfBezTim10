@@ -1,16 +1,22 @@
 package com.example.InfBezTim10.controller;
 
+import com.example.InfBezTim10.dto.CertificateBasicDTO;
+import com.example.InfBezTim10.mapper.CertificateMapper;
 import com.example.InfBezTim10.model.Certificate;
 import com.example.InfBezTim10.repository.ICertificateRepository;
 import com.example.InfBezTim10.service.implementation.CertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/certificate")
@@ -47,4 +53,16 @@ public class CertificateController {
         return ResponseEntity.status(HttpStatus.OK).body("bar");
 
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping()
+    public ResponseEntity<List<CertificateBasicDTO>> getAll() {
+        List<Certificate> certificateList = certificateGenerator.findAll();
+        List<CertificateBasicDTO> certificateBasicDTOS = certificateList.stream()
+                .map(CertificateMapper.INSTANCE::certificateToCertificateBasicDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(certificateBasicDTOS);
+    }
+
+
 }

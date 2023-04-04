@@ -2,11 +2,10 @@ package com.example.InfBezTim10.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
+
 import java.util.Date;
 
 @Document(collection = "certificates")
@@ -23,4 +22,6 @@ public class Certificate extends BaseEntity {
     public CertificateStatus status;
     public CertificateType type;
     public String userEmail;
+
+
 }
