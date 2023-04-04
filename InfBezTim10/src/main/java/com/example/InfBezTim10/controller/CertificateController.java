@@ -11,11 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @RestController
@@ -64,5 +66,11 @@ public class CertificateController {
         return ResponseEntity.status(HttpStatus.OK).body(certificateBasicDTOS);
     }
 
+
+//     @GetMapping(value="/validate/{serialNumber}")
+//     public ResponseEntity<?> validate(@PathVariable("serialNumber")BigInteger serialNumber){
+//
+//
+//    }
 
 }

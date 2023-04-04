@@ -40,6 +40,14 @@ public class CertificateService extends JPAService<Certificate> implements ICert
     @Value("${cert.dir}")
     public static String certDir;
 
+
+//    private Certificate findCertificateBySerialNumberSafe(BigInteger serialNumber) {
+//        var certificateOpt = certificateRepository.findBySerialNumber(serialNumber);
+//        if (certificateOpt.isEmpty()) {
+//            throw new MissingEntityException("Certificate with provided serial number does not exist.");
+//        }
+//
+//        return certificate;
     @Autowired
     public CertificateService(ICertificateRepository certificateRepository, CertificateGenerator certificateGenerator,
                               CertificateConfigValidator configValidator, IUserRepository userRepository) {
@@ -48,6 +56,7 @@ public class CertificateService extends JPAService<Certificate> implements ICert
         this.configValidator = configValidator;
         this.userRepository = userRepository;
     }
+
 
     public Certificate issueCertificate(String issuerSN, String subjectUsername, String keyUsageFlags, Date validTo)
             throws CertificateGenerationException {
