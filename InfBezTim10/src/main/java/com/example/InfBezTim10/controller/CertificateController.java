@@ -1,6 +1,6 @@
 package com.example.InfBezTim10.controller;
 
-import com.example.InfBezTim10.dto.CertificateBasicDTO;
+import com.example.InfBezTim10.dto.CertificateDTO;
 import com.example.InfBezTim10.dto.CertificateRequestDTO;
 import com.example.InfBezTim10.mapper.CertificateMapper;
 import com.example.InfBezTim10.model.Certificate;
@@ -30,27 +30,27 @@ public class CertificateController {
     }
 
     @PostMapping(value = "/issueCertificate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Certificate> issueCertificate(@RequestBody CertificateRequestDTO certificateRequestDTO) {
+    public ResponseEntity<CertificateDTO> issueCertificate(@RequestBody CertificateRequestDTO certificateRequestDTO) {
         try {
             Certificate certificate = certificateGeneratorService.issueCertificate(
                     certificateRequestDTO.getIssuerSN(),
                     certificateRequestDTO.getSubjectUsername(),
                     certificateRequestDTO.getKeyUsageFlags(),
                     certificateRequestDTO.getValidTo());
-            return new ResponseEntity<>(certificate, HttpStatus.OK);
+            return new ResponseEntity<>(CertificateMapper.INSTANCE.certificateToCertificateDTO(certificate), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping()
-    public ResponseEntity<List<CertificateBasicDTO>> getAll() {
+    public ResponseEntity<List<CertificateDTO>> getAll() {
         List<Certificate> certificateList = certificateService.findAll();
-        List<CertificateBasicDTO> certificateBasicDTOS = certificateList.stream()
-                .map(CertificateMapper.INSTANCE::certificateToCertificateBasicDTO)
+        List<CertificateDTO> certificateDTOS = certificateList.stream()
+                .map(CertificateMapper.INSTANCE::certificateToCertificateDTO)
                 .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(certificateBasicDTOS);
+        return ResponseEntity.status(HttpStatus.OK).body(certificateDTOS);
     }
 
 
