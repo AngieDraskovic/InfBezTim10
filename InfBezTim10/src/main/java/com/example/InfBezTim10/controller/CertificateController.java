@@ -1,30 +1,31 @@
 package com.example.InfBezTim10.controller;
 
+import com.example.InfBezTim10.dto.CertificateBasicDTO;
 import com.example.InfBezTim10.dto.CertificateRequestDTO;
+import com.example.InfBezTim10.mapper.CertificateMapper;
 import com.example.InfBezTim10.model.Certificate;
-import com.example.InfBezTim10.repository.ICertificateRepository;
 import com.example.InfBezTim10.service.ICertificateGeneratorService;
-import com.example.InfBezTim10.service.implementation.CertificateService;
-import com.mongodb.lang.Nullable;
+import com.example.InfBezTim10.service.ICertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/certificate")
 public class CertificateController {
 
+    ICertificateService certificateService;
     ICertificateGeneratorService certificateGeneratorService;
 
     @Autowired
-    public CertificateController(ICertificateGeneratorService certificateGeneratorService) {
+    public CertificateController(ICertificateService certificateService, ICertificateGeneratorService certificateGeneratorService) {
+        this.certificateService = certificateService;
         this.certificateGeneratorService = certificateGeneratorService;
     }
 
@@ -41,4 +42,16 @@ public class CertificateController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping()
+    public ResponseEntity<List<CertificateBasicDTO>> getAll() {
+        List<Certificate> certificateList = certificateService.findAll();
+        List<CertificateBasicDTO> certificateBasicDTOS = certificateList.stream()
+                .map(CertificateMapper.INSTANCE::certificateToCertificateBasicDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(certificateBasicDTOS);
+    }
+
+
 }

@@ -1,7 +1,8 @@
 package com.example.InfBezTim10.service.implementation;
 
+
 import com.example.InfBezTim10.exception.CertificateNotFoundException;
-import com.example.InfBezTim10.model.*;
+import com.example.InfBezTim10.model.Certificate;
 import com.example.InfBezTim10.repository.ICertificateRepository;
 import com.example.InfBezTim10.service.ICertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +22,15 @@ public class CertificateService extends MongoService<Certificate> implements ICe
     @Override
     public Certificate findBySerialNumber(String serialNumber) {
         Certificate certificate = certificateRepository.findBySerialNumber(serialNumber);
-        if (certificate == null){
+        if (certificate == null) {
             throw new CertificateNotFoundException("Certificate with serial number " + serialNumber + " not found.");
         }
 
         return certificate;
     }
 
-    @Override
     protected MongoRepository<Certificate, String> getEntityRepository() {
         return certificateRepository;
     }
+
 }
