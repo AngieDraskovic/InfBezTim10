@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ICertificateRequestRepository extends MongoRepository<CertificateRequest, String> {
+        List<CertificateRequest> findBySubjectUsername(String username);
 
 }

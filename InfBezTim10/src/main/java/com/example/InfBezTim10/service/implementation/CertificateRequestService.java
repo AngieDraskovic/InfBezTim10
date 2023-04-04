@@ -1,9 +1,11 @@
 package com.example.InfBezTim10.service.implementation;
 import com.example.InfBezTim10.dto.CertificateRequestDTO;
-import com.example.InfBezTim10.exception.CertificateNotFoundException;
+import com.example.InfBezTim10.exception.CertificateGenerationException;
 import com.example.InfBezTim10.exception.NotFoundException;
+import com.example.InfBezTim10.mapper.CertificateRequestMapper;
 import com.example.InfBezTim10.model.*;
 import com.example.InfBezTim10.repository.ICertificateRequestRepository;
+import com.example.InfBezTim10.service.ICertificateGeneratorService;
 import com.example.InfBezTim10.service.ICertificateRequestService;
 import com.example.InfBezTim10.service.ICertificateService;
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -12,18 +14,20 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class CertificateRequestService extends MongoService<CertificateRequest>  implements ICertificateRequestService {
 
     private final ICertificateRequestRepository certificateRequestRepository;
     private final ICertificateService certificateService;
+    private final ICertificateGeneratorService certificateGeneratorService;
 
     @Autowired
-    public CertificateRequestService(ICertificateRequestRepository certificateRequestRepository, ICertificateService certificateService) {
+    public CertificateRequestService(ICertificateRequestRepository certificateRequestRepository, ICertificateService certificateService, ICertificateGeneratorService certificateGeneratorService) {
         this.certificateRequestRepository = certificateRequestRepository;
         this.certificateService = certificateService;
+        this.certificateGeneratorService = certificateGeneratorService;
     }
 
 
@@ -32,6 +36,9 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         return this.certificateRequestRepository;
     }
 
+    public List<CertificateRequest> getCertificateRequestsByUser(String username) {
+        return certificateRequestRepository.findBySubjectUsername(username);
+    }
 
     private static KeyUsage parseFlags(String keyUsageFlags) {
         if (keyUsageFlags == null || keyUsageFlags.isEmpty()) {
@@ -64,36 +71,76 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
             return CertificateType.INTERMEDIATE;
         }
 
-        return  CertificateType.END;
+        return CertificateType.END;
     }
 
 
 
-    public CertificateRequest createCertificateRequest(CertificateRequestDTO certificateRequestDTO, String userRole, String currentUserEmail) {
+    public CertificateRequest createCertificateRequest(CertificateRequestDTO certificateRequestDTO, String userRole, String currentUserEmail) throws CertificateGenerationException {
         // Validate the certificate type based on the user role
-        if (!userRole.equals("ADMIN") && getCertificateType(certificateRequestDTO.getKeyUsageFlags()) == CertificateType.ROOT) {
+        if (!userRole.equals("ROLE_ADMIN") && getCertificateType(certificateRequestDTO.getKeyUsageFlags()) == CertificateType.ROOT) {
             throw new IllegalArgumentException("Only admins can request root certificates.");
         }
-        CertificateRequest certificateRequest = new CertificateRequest();
-        certificateRequest.setIssuerSN(certificateRequestDTO.getIssuerSN());
-        certificateRequest.setSubjectUsername(certificateRequestDTO.getSubjectUsername());
-        certificateRequest.setKeyUsageFlags(certificateRequestDTO.getKeyUsageFlags());
-        certificateRequest.setValidTo(certificateRequestDTO.getValidTo());
 
-        // Fetch the certificate by its serial number
-        Certificate issuerCertificate = certificateService.findBySerialNumber(certificateRequestDTO.getIssuerSN());
+        CertificateRequest certificateRequest = CertificateRequestMapper.INSTANCE.certificateRequestDTOToCertificateRequest(certificateRequestDTO);
 
-        if (issuerCertificate == null) {
-            throw new CertificateNotFoundException("Certificate with serial number " + certificateRequestDTO.getIssuerSN() + " not found.");
+        String cerificateEmail = "";
+
+        if (certificateRequestDTO.getIssuerSN() != null)
+        {
+            // Fetch the certificate by its serial number
+            Certificate issuerCertificate = certificateService.findBySerialNumber(certificateRequestDTO.getIssuerSN());
+            cerificateEmail = issuerCertificate.getUserEmail();
         }
 
         // Set status based on the rules mentioned in the task
-        if (issuerCertificate.getUserEmail().equals(currentUserEmail) || userRole.equals("ADMIN")) {
-            certificateRequest.setStatus("APPROVED");
+        if (cerificateEmail.equals(currentUserEmail) || userRole.equals("ROLE_ADMIN")) {
+
+            certificateGeneratorService.issueCertificate(certificateRequest.getIssuerSN(), certificateRequest.getSubjectUsername(), certificateRequest.getKeyUsageFlags(), certificateRequest.getValidTo());
+            certificateRequest.setStatus(CertificateRequestStatus.APPROVED);
         } else {
-            certificateRequest.setStatus("PENDING");
+            certificateRequest.setStatus(CertificateRequestStatus.PENDING);
         }
         return certificateRequestRepository.save(certificateRequest);
     }
+
+
+    public Certificate approveCertificateRequest(String requestId, String username) throws CertificateGenerationException {
+        CertificateRequest request = getCertificateRequestByIdAndUsername(requestId, username);
+
+        Certificate generatedCertificate = certificateGeneratorService.issueCertificate(
+                request.getIssuerSN(), request.getSubjectUsername(),
+                request.getKeyUsageFlags(), request.getValidTo()
+        );
+
+        request.setStatus(CertificateRequestStatus.APPROVED);
+        certificateRequestRepository.save(request);
+
+        return generatedCertificate;
+    }
+
+    public void rejectCertificateRequest(String requestId, String username, String rejectionReason) {
+        CertificateRequest request = getCertificateRequestByIdAndUsername(requestId, username);
+
+        request.setStatus(CertificateRequestStatus.REJECTED);
+        request.setReason(rejectionReason);
+        certificateRequestRepository.save(request);
+    }
+
+    private CertificateRequest getCertificateRequestByIdAndUsername(String requestId, String username) {
+        CertificateRequest request = certificateRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Certificate request not found"));
+
+        Certificate issuerCertificate = certificateService.findBySerialNumber(request.getIssuerSN());
+
+        if (!issuerCertificate.getUserEmail().equals(username)) {
+            throw new IllegalArgumentException("User is not authorized to approve or reject this certificate request");
+        }
+
+        return request;
+    }
+
+
+
 }
 

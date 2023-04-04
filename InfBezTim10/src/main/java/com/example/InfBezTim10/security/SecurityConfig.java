@@ -43,7 +43,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .authorizeRequests()
+                .authorizeHttpRequests()
                 .requestMatchers(POST, "/api/certificate/issueCertificate").permitAll()
                 .requestMatchers(POST, "/api/user/login").permitAll()
                 .requestMatchers(POST, "/api/user/register").permitAll()
@@ -83,6 +83,9 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(HttpMethod.POST, "/api/user/login");
+        return (web) -> {
+            web.ignoring().requestMatchers(HttpMethod.POST, "/api/user/login");
+            web.ignoring().requestMatchers(HttpMethod.POST, "/api/user/registration");
+        };
     }
 }

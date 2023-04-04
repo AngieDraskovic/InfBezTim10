@@ -18,6 +18,6 @@ public class CertificateRequest extends BaseEntity {
     private String subjectUsername;
     private String keyUsageFlags;
     private Date validTo;
-    private String status;
+    private CertificateRequestStatus status;
     private String reason;
 }
