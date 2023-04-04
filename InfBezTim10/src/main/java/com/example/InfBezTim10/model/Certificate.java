@@ -22,6 +22,5 @@ public class Certificate extends BaseEntity {
     public Date validTo;
     public CertificateStatus status;
     public CertificateType type;
-    // user associated with certificate
     public String userEmail;
 }
