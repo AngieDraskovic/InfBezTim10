@@ -13,8 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.Date;
 
 @Service
 public class CertificateRequestService extends MongoService<CertificateRequest>  implements ICertificateRequestService {
@@ -97,9 +98,22 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
             if (issuerCertificate.getType() == CertificateType.END){
                 throw new IllegalArgumentException("Can not issue certificate based on end certificate.");
             }
+            if (issuerCertificate.getStatus() == CertificateStatus.INVALID){
+                throw new IllegalArgumentException("Can not issue certificate based on invalid certificate.");
+            }
 
+            Date currentDate = new Date();
+
+            if (currentDate.before(issuerCertificate.getValidFrom()) || currentDate.after(issuerCertificate.getValidTo())) {
+                throw new IllegalArgumentException("Can not issue certificate based on invalid certificate.");
+            }
 
             cerificateEmail = issuerCertificate.getUserEmail();
+        }
+
+        if(cerificateEmail.equals("") && !userRole.equals("ROLE_ADMIN"))
+        {
+            throw new IllegalArgumentException("Only admin can ask for root certificate.");
         }
 
         // Set status based on the rules mentioned in the task
