@@ -15,6 +15,13 @@ import java.util.List;
 @ControllerAdvice
 public class CustomExceptionHandler {
 
+    @ExceptionHandler({Exception.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ResponseEntity<ErrorDTO> pera(Exception e) {
+        String pera = String.valueOf(e.getClass());
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ResponseEntity<ErrorDTO> handleConstraintViolationException(MethodArgumentNotValidException e) {

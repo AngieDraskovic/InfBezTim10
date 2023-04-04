@@ -1,10 +1,15 @@
 package com.example.InfBezTim10.controller;
 
+import com.example.InfBezTim10.dto.CertificateRequestDTO;
 import com.example.InfBezTim10.model.Certificate;
 import com.example.InfBezTim10.repository.ICertificateRepository;
+import com.example.InfBezTim10.service.ICertificateGeneratorService;
 import com.example.InfBezTim10.service.implementation.CertificateService;
+import com.mongodb.lang.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,35 +21,24 @@ import java.util.Date;
 @RequestMapping("/api/certificate")
 public class CertificateController {
 
-    ICertificateRepository certificateRepository;
-    CertificateService certificateGenerator;
+    ICertificateGeneratorService certificateGeneratorService;
 
     @Autowired
-    public CertificateController(CertificateService certificateGenerator) {
-        this.certificateGenerator = certificateGenerator;
+    public CertificateController(ICertificateGeneratorService certificateGeneratorService) {
+        this.certificateGeneratorService = certificateGeneratorService;
     }
 
-
-    @GetMapping(value = "/foo")
-    public ResponseEntity<?> foo() {
-
+    @PostMapping(value = "/issueCertificate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Certificate> issueCertificate(@RequestBody CertificateRequestDTO certificateRequestDTO) {
         try {
-            // Replace with your test parameters
-            String issuerSN = "f741df8de1f22c77";
-            String subjectUsername = "peraperic@gmail.com";
-            String keyUsageFlags = "0,1,2,3,4,5,6,7,8";
-            Date validTo = Date.from(LocalDateTime.now().plusDays(10).atZone(ZoneId.systemDefault()).toInstant());
-
-            Certificate generatedCertificate = certificateGenerator.issueCertificate(issuerSN, subjectUsername, keyUsageFlags, validTo);
-
-            System.out.println("Generated certificate:");
-            System.out.println(generatedCertificate);
-
+            Certificate certificate = certificateGeneratorService.issueCertificate(
+                    certificateRequestDTO.getIssuerSN(),
+                    certificateRequestDTO.getSubjectUsername(),
+                    certificateRequestDTO.getKeyUsageFlags(),
+                    certificateRequestDTO.getValidTo());
+            return new ResponseEntity<>(certificate, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return ResponseEntity.status(HttpStatus.OK).body("bar");
-
     }
 }
