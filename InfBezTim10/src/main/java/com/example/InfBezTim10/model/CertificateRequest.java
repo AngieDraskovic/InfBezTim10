@@ -5,6 +5,8 @@ import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 
 @Document(collection = "certificate_requests")
 @Getter
@@ -15,7 +17,7 @@ public class CertificateRequest extends BaseEntity {
     private String issuerSN;
     private String subjectUsername;
     private String keyUsageFlags;
-    private String validTo;
+    private Date validTo;
     private String status;
     private String reason;
 }
