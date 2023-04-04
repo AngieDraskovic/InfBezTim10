@@ -3,11 +3,15 @@ package com.example.InfBezTim10.service.implementation;
 
 import com.example.InfBezTim10.exception.CertificateNotFoundException;
 import com.example.InfBezTim10.model.Certificate;
+import com.example.InfBezTim10.model.CertificateStatus;
 import com.example.InfBezTim10.repository.ICertificateRepository;
 import com.example.InfBezTim10.service.ICertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.Calendar;
+import java.util.Date;
 
 @Service
 public class CertificateService extends MongoService<Certificate> implements ICertificateService {
@@ -27,6 +31,22 @@ public class CertificateService extends MongoService<Certificate> implements ICe
         }
 
         return certificate;
+    }
+
+    @Override
+    public boolean validate(String serialNumber) {
+        Certificate certificate = findBySerialNumber(serialNumber);
+        if (certificate.getStatus()!= CertificateStatus.VALID) {
+            return false;
+        }
+        if (certificate.getValidTo().before(Calendar.getInstance().getTime())) {
+            certificate.setStatus(CertificateStatus.INVALID);
+            save(certificate);
+            return false;
+        }
+
+        return true;
+
     }
 
     protected MongoRepository<Certificate, String> getEntityRepository() {

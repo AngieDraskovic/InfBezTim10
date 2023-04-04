@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface ICertificateRepository extends MongoRepository<Certificate, String> {
 
     @Query("{ 'SerialNumber' : ?0 }")
-    Certificate findBySerialNumber(String SerialNumber);
+    Certificate findBySerialNumber(String serialNumber);
 }
