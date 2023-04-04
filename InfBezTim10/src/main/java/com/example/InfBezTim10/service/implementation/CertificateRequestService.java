@@ -41,50 +41,7 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         return certificateRequestRepository.findBySubjectUsername(username);
     }
 
-    private static KeyUsage parseFlags(String keyUsageFlags) {
-        if (keyUsageFlags == null || keyUsageFlags.isEmpty()) {
-            throw new IllegalArgumentException("KeyUsageFlags are mandatory");
-        }
-        String[] flagArray = keyUsageFlags.split(",");
-        int retVal = 0;
-
-        for (String flag : flagArray) {
-            try {
-                int index = Integer.parseInt(flag);
-                retVal |= 1 << index;
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Unknown flag: " + flag, e);
-            }
-        }
-        return new KeyUsage(retVal);
-    }
-
-
-    private static CertificateType getCertificateType(String keyUsageString) {
-
-        KeyUsage keyUsage = parseFlags(keyUsageString);
-
-        int usageFlags = keyUsage.getBytes()[0]; // Get the byte array of the key usage flags and use the first byte
-
-        if ((usageFlags & KeyUsage.keyCertSign) != 0) {
-            return CertificateType.ROOT;
-        } else if ((usageFlags & KeyUsage.cRLSign) != 0) {
-            return CertificateType.INTERMEDIATE;
-        }
-
-        return CertificateType.END;
-    }
-
-
-
     public CertificateRequest createCertificateRequest(CertificateRequestDTO certificateRequestDTO, String userRole, String currentUserEmail) throws CertificateGenerationException {
-        // Validate the certificate type based on the user role
-
-        CertificateType requestCertificateType = getCertificateType(certificateRequestDTO.getKeyUsageFlags());
-
-        if (!userRole.equals("ROLE_ADMIN") && requestCertificateType == CertificateType.ROOT) {
-            throw new IllegalArgumentException("Only admins can request root certificates.");
-        }
 
         CertificateRequest certificateRequest = CertificateRequestMapper.INSTANCE.certificateRequestDTOToCertificateRequest(certificateRequestDTO);
 
@@ -154,7 +111,9 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         CertificateRequest request = certificateRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Certificate request not found"));
 
-        if (!request.getSubjectUsername().equals(username)) {
+        Certificate certificate = certificateService.findBySerialNumber(request.getIssuerSN());
+
+        if (!certificate.getUserEmail().equals(username)) {
             throw new IllegalArgumentException("User is not authorized to approve or reject this certificate request");
         }
 
