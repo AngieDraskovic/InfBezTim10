@@ -78,7 +78,10 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
 
     public CertificateRequest createCertificateRequest(CertificateRequestDTO certificateRequestDTO, String userRole, String currentUserEmail) throws CertificateGenerationException {
         // Validate the certificate type based on the user role
-        if (!userRole.equals("ROLE_ADMIN") && getCertificateType(certificateRequestDTO.getKeyUsageFlags()) == CertificateType.ROOT) {
+
+        CertificateType requestCertificateType = getCertificateType(certificateRequestDTO.getKeyUsageFlags());
+
+        if (!userRole.equals("ROLE_ADMIN") && requestCertificateType == CertificateType.ROOT) {
             throw new IllegalArgumentException("Only admins can request root certificates.");
         }
 
@@ -90,6 +93,12 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         {
             // Fetch the certificate by its serial number
             Certificate issuerCertificate = certificateService.findBySerialNumber(certificateRequestDTO.getIssuerSN());
+
+            if (issuerCertificate.getType() == CertificateType.END){
+                throw new IllegalArgumentException("Can not issue certificate based on end certificate.");
+            }
+
+
             cerificateEmail = issuerCertificate.getUserEmail();
         }
 
