@@ -31,15 +31,15 @@ public class CertificateRequestController {
 
     @PostMapping("/create-user")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> createUserCertificateRequest(@RequestBody CertificateRequestDTO certificateRequestDTO) {
+    public ResponseEntity<?> createUserCertificateRequest(@RequestBody CertificateRequestDTO certificateRequestDTO, Principal principal) {
 
-        return ResponseEntity.ok(certificateRequestService.createCertificateRequest(certificateRequestDTO, "USER"));
+        return ResponseEntity.ok(certificateRequestService.createCertificateRequest(certificateRequestDTO, "USER", principal.getName()));
     }
 
     @PostMapping("/create-admin")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> createAdminCertificateRequest(@RequestBody CertificateRequestDTO certificateRequestDTO) {
-        return ResponseEntity.ok(certificateRequestService.createCertificateRequest(certificateRequestDTO, "ADMIN"));
+    public ResponseEntity<?> createAdminCertificateRequest(@RequestBody CertificateRequestDTO certificateRequestDTO, Principal principal) {
+        return ResponseEntity.ok(certificateRequestService.createCertificateRequest(certificateRequestDTO, "ADMIN", principal.getName()));
     }
 
 

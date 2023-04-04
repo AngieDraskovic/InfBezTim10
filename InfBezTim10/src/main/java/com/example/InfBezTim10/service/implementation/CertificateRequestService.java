@@ -1,9 +1,11 @@
 package com.example.InfBezTim10.service.implementation;
 import com.example.InfBezTim10.dto.CertificateRequestDTO;
+import com.example.InfBezTim10.exception.CertificateNotFoundException;
 import com.example.InfBezTim10.exception.NotFoundException;
 import com.example.InfBezTim10.model.*;
 import com.example.InfBezTim10.repository.ICertificateRequestRepository;
 import com.example.InfBezTim10.service.ICertificateRequestService;
+import com.example.InfBezTim10.service.ICertificateService;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -16,10 +18,12 @@ import java.util.Optional;
 public class CertificateRequestService extends MongoService<CertificateRequest>  implements ICertificateRequestService {
 
     private final ICertificateRequestRepository certificateRequestRepository;
+    private final ICertificateService certificateService;
 
     @Autowired
-    public CertificateRequestService(ICertificateRequestRepository certificateRequestRepository) {
+    public CertificateRequestService(ICertificateRequestRepository certificateRequestRepository, ICertificateService certificateService) {
         this.certificateRequestRepository = certificateRequestRepository;
+        this.certificateService = certificateService;
     }
 
 
@@ -65,7 +69,7 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
 
 
 
-    public CertificateRequest createCertificateRequest(CertificateRequestDTO certificateRequestDTO, String userRole) {
+    public CertificateRequest createCertificateRequest(CertificateRequestDTO certificateRequestDTO, String userRole, String currentUserEmail) {
         // Validate the certificate type based on the user role
         if (!userRole.equals("ADMIN") && getCertificateType(certificateRequestDTO.getKeyUsageFlags()) == CertificateType.ROOT) {
             throw new IllegalArgumentException("Only admins can request root certificates.");
@@ -75,8 +79,16 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         certificateRequest.setSubjectUsername(certificateRequestDTO.getSubjectUsername());
         certificateRequest.setKeyUsageFlags(certificateRequestDTO.getKeyUsageFlags());
         certificateRequest.setValidTo(certificateRequestDTO.getValidTo());
+
+        // Fetch the certificate by its serial number
+        Certificate issuerCertificate = certificateService.findBySerialNumber(certificateRequestDTO.getIssuerSN());
+
+        if (issuerCertificate == null) {
+            throw new CertificateNotFoundException("Certificate with serial number " + certificateRequestDTO.getIssuerSN() + " not found.");
+        }
+
         // Set status based on the rules mentioned in the task
-        if (certificateRequest.getIssuerSN().equals(certificateRequest.getSubjectUsername()) || userRole.equals("ADMIN")) {
+        if (issuerCertificate.getUserEmail().equals(currentUserEmail) || userRole.equals("ADMIN")) {
             certificateRequest.setStatus("APPROVED");
         } else {
             certificateRequest.setStatus("PENDING");
