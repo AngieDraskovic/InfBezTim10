@@ -1,6 +1,8 @@
 package com.example.InfBezTim10.service.implementation;
 
 import com.example.InfBezTim10.exception.EmailAlreadyExistsException;
+import com.example.InfBezTim10.exception.NotFoundException;
+import com.example.InfBezTim10.exception.UserNotFoundException;
 import com.example.InfBezTim10.model.AuthorityEnum;
 import com.example.InfBezTim10.model.User;
 import com.example.InfBezTim10.repository.IUserRepository;
@@ -11,13 +13,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 
 @Service
-public class UserService extends JPAService<User> implements IUserService, UserDetailsService {
+public class UserService extends MongoService<User> implements IUserService, UserDetailsService {
 
     private final IUserRepository userRepository;
     private final IAuthorityService authorityService;
@@ -29,13 +30,8 @@ public class UserService extends JPAService<User> implements IUserService, UserD
     }
 
     @Override
-    protected MongoRepository<User, String> getEntityRepository() {
-        return this.userRepository;
-    }
-
-    @Override
     public User register(User user) {
-        if (findByEmail(user.getEmail()) != null)
+        if (userRepository.findByEmail(user.getEmail()) != null)
             throw new EmailAlreadyExistsException("Email is already taken");
 
         user.setAuthority(authorityService.getAuthority(AuthorityEnum.USER));
@@ -44,7 +40,11 @@ public class UserService extends JPAService<User> implements IUserService, UserD
 
     @Override
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("User with email " + email + " not found.");
+        }
+        return user;
     }
 
     @Override
@@ -52,5 +52,10 @@ public class UserService extends JPAService<User> implements IUserService, UserD
         var user = userRepository.findByEmail(username);
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 Arrays.asList(user.getAuthority()));
+    }
+
+    @Override
+    protected MongoRepository<User, String> getEntityRepository() {
+        return this.userRepository;
     }
 }

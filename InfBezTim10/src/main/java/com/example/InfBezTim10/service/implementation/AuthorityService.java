@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthorityService extends JPAService<Authority> implements IAuthorityService {
+public class AuthorityService extends MongoService<Authority> implements IAuthorityService {
 
     private IAuthorityRepository authorityRepository;
 

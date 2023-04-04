@@ -1,21 +1,21 @@
 package com.example.InfBezTim10.dto;
 
-import com.example.InfBezTim10.model.CertificateType;
-import com.example.InfBezTim10.model.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class CertificateRequestDTO {
-    private String issuerSN;
-    private String subjectUsername;
-    private String keyUsageFlags;
-    private String validTo;
-    private CertificateType certificateType;
-
+    String issuerSN;
+    String subjectUsername;
+    String keyUsageFlags;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+02:00")
+    Date validTo;
 }
