@@ -43,7 +43,7 @@ public class UserActivationService extends MongoService<UserActivation> implemen
     @Override
     public void deleteIfAlreadyExists(User user){
         if (userActivationRepository.existsByUser(user)) {
-                userActivationRepository.deleteByUser(user);
+            userActivationRepository.deleteByUser(user);
         }
     }
 

@@ -16,7 +16,6 @@ import java.io.IOException;
 @Service
 public class SendgridEmailService implements ISendgridEmailService {
 
-    private static final String SENDGRID_API_KEY = "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";
 
     @Override
     public void sendConfirmEmailMessage(User toUser, String code) throws IOException {
@@ -27,7 +26,7 @@ public class SendgridEmailService implements ISendgridEmailService {
                 + code +  "\n\n" + "If you did not perform this registration please contact our support: \n" +
                 "support@tim10.com\n\n Best regards,\nTim10 team!");
         Mail mail = new Mail(from, subject, to, content);
-        SendGrid sg = new SendGrid(SENDGRID_API_KEY);
+        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
         Request request = new Request();
         try {
             request.setMethod(Method.POST);
@@ -45,5 +44,32 @@ public class SendgridEmailService implements ISendgridEmailService {
             throw ex;
         }
     }
+    @Override
+    public void sendNewPasswordMail(User toUser, String code) throws IOException {
+        Email from = new Email("tim961495@gmail.com");
+        String subject = "New Password Request";
+        Email to = new Email(toUser.getEmail());
+        Content content = new Content("text/plain", "Dear " + toUser.getName() + ", \n\nTo reset your password use this code: \n"
+                + code +  "\n\n" + "Best regards,\nTim10 team!");
+        Mail mail = new Mail(from, subject, to, content);
+        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
+        Request request = new Request();
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+
+            Response response = sg.api(request);
+            if (response.getStatusCode() == 202) {
+                System.out.println("Email sent successfully!");
+            } else {
+                System.out.println("Failed to send email: " + response.getBody());
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            throw ex;
+        }
+    }
+
 
 }

@@ -7,4 +7,5 @@ import java.io.IOException;
 public interface ISendgridEmailService {
 
     void sendConfirmEmailMessage(User toUser, String code) throws IOException;
+    void sendNewPasswordMail(User toUser, String code) throws IOException;
 }

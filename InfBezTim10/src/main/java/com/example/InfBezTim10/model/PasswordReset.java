@@ -9,26 +9,21 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Objects;
 
-@Document(collection = "activations")
+@Document(collection = "resets")
 @Getter
 @AllArgsConstructor
 @Setter
 @RequiredArgsConstructor
-public class UserActivation extends BaseEntity {
-
+public class PasswordReset extends BaseEntity{
     @Indexed(unique=true)
-    private String activationId;
+    private String code;
     @DBRef
     private User user;
     private LocalDateTime creationDate;
-
     @Override
     public int hashCode() {
-        return Objects.hash(getActivationId(), getUser(), getCreationDate());
+        return Objects.hash(getCode(), getUser(), getCreationDate());
     }
-
-
 }

@@ -3,6 +3,7 @@ package com.example.InfBezTim10.controller;
 import com.example.InfBezTim10.dto.*;
 import com.example.InfBezTim10.exception.EmailAlreadyExistsException;
 import com.example.InfBezTim10.exception.NotFoundException;
+import com.example.InfBezTim10.exception.UserNotActivatedException;
 import com.example.InfBezTim10.mapper.UserMapper;
 import com.example.InfBezTim10.model.User;
 import com.example.InfBezTim10.model.UserActivation;
@@ -61,11 +62,18 @@ public class UserController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            User user = userService.findByEmail(userCredentialDTO.getEmail());
+            if(!user.getActive()){
+                throw new UserNotActivatedException("You have not confirmed your email/phone when registering");
+            }
+
             String token = jwtUtil.generateToken(authentication);
             AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
             return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO("Wrong username or password!"));
+        } catch (UserNotActivatedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -79,12 +87,15 @@ public class UserController {
             UserDetailsDTO userDetailsDTO = UserMapper.INSTANCE.userToUserDetailsDTO(user);
 
             userActivationService.deleteIfAlreadyExists(user);
+            System.out.println("1");
             ZoneOffset desiredOffset = ZoneOffset.of("+04:00");
             ZonedDateTime zonedDateTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).withZoneSameInstant(desiredOffset);
             UserActivation activation = new UserActivation(String.valueOf(rand.nextInt(Integer.MAX_VALUE)), user,
                     zonedDateTime.toLocalDateTime());
             userActivationService.save(activation);
+            System.out.println("2");
             sendgridEmailService.sendConfirmEmailMessage(user, activation.getActivationId());
+            System.out.println("3");
             return ResponseEntity.status(HttpStatus.OK).body(userDetailsDTO);
         } catch (EmailAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
@@ -102,6 +113,14 @@ public class UserController {
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessageDTO("Succesful account activation!"));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessageDTO("Successful account activation!"));
     }
+
+//    @GetMapping(value = "/resetPassword/{email}")
+//    public ResponseEntity<Void> sendEmailForPasswordReset(@PathVariable("email") String email){
+//        User user = userService.findByEmail(email);
+//
+//        userService.resetPassword(user.getEmail());
+//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//    }
 }
