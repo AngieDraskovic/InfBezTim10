@@ -2,11 +2,15 @@ package com.example.InfBezTim10.controller;
 
 import com.example.InfBezTim10.dto.*;
 import com.example.InfBezTim10.exception.EmailAlreadyExistsException;
+import com.example.InfBezTim10.exception.NotFoundException;
+import com.example.InfBezTim10.exception.UserNotActivatedException;
 import com.example.InfBezTim10.mapper.UserMapper;
 import com.example.InfBezTim10.model.User;
+import com.example.InfBezTim10.model.UserActivation;
 import com.example.InfBezTim10.security.JwtUtil;
+import com.example.InfBezTim10.service.ISendgridEmailService;
+import com.example.InfBezTim10.service.IUserActivationService;
 import com.example.InfBezTim10.service.IUserService;
-import com.example.InfBezTim10.service.implementation.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,10 +21,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Random;
+
 
 @RestController
 @RequestMapping("/api/user")
@@ -29,13 +38,19 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final IUserActivationService userActivationService;
+    private final ISendgridEmailService sendgridEmailService;
+    private final Random rand = new Random();
 
     @Autowired
-    public UserController(UserService userService, AuthenticationManager authenticationManager, JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
+    public UserController(IUserService userService, AuthenticationManager authenticationManager, JwtUtil jwtUtil, PasswordEncoder passwordEncoder, IUserActivationService userActivationService,
+                          ISendgridEmailService sendgridEmailService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
+        this.userActivationService = userActivationService;
+        this.sendgridEmailService = sendgridEmailService;
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,11 +62,18 @@ public class UserController {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            User user = userService.findByEmail(userCredentialDTO.getEmail());
+            if(!user.getActive()){
+                throw new UserNotActivatedException("You have not confirmed your email/phone when registering");
+            }
+
             String token = jwtUtil.generateToken(authentication);
             AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
             return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO("Wrong username or password!"));
+        } catch (UserNotActivatedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -60,11 +82,45 @@ public class UserController {
         try {
             User user = UserMapper.INSTANCE.userRegistrationDTOtoUser(userRegistrationDTO);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setActive(false);
             user = userService.register(user);
             UserDetailsDTO userDetailsDTO = UserMapper.INSTANCE.userToUserDetailsDTO(user);
+
+            userActivationService.deleteIfAlreadyExists(user);
+            System.out.println("1");
+            ZoneOffset desiredOffset = ZoneOffset.of("+04:00");
+            ZonedDateTime zonedDateTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).withZoneSameInstant(desiredOffset);
+            UserActivation activation = new UserActivation(String.valueOf(rand.nextInt(Integer.MAX_VALUE)), user,
+                    zonedDateTime.toLocalDateTime());
+            userActivationService.save(activation);
+            System.out.println("2");
+            sendgridEmailService.sendConfirmEmailMessage(user, activation.getActivationId());
+            System.out.println("3");
             return ResponseEntity.status(HttpStatus.OK).body(userDetailsDTO);
         } catch (EmailAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
+
+
+    @GetMapping(value="/activate/{activationId}")
+    public ResponseEntity<?> activateUser(@PathVariable("activationId") String activationId){
+        try {
+            userActivationService.activate(activationId);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessageDTO("Successful account activation!"));
+    }
+
+//    @GetMapping(value = "/resetPassword/{email}")
+//    public ResponseEntity<Void> sendEmailForPasswordReset(@PathVariable("email") String email){
+//        User user = userService.findByEmail(email);
+//
+//        userService.resetPassword(user.getEmail());
+//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//    }
 }

@@ -1,7 +1,6 @@
 package com.example.InfBezTim10.service.implementation;
 
 import com.example.InfBezTim10.exception.EmailAlreadyExistsException;
-import com.example.InfBezTim10.exception.NotFoundException;
 import com.example.InfBezTim10.exception.UserNotFoundException;
 import com.example.InfBezTim10.model.AuthorityEnum;
 import com.example.InfBezTim10.model.User;
@@ -23,10 +22,12 @@ public class UserService extends MongoService<User> implements IUserService, Use
     private final IUserRepository userRepository;
     private final IAuthorityService authorityService;
 
+
     @Autowired
     public UserService(IUserRepository userRepository, IAuthorityService authorityService) {
         this.userRepository = userRepository;
         this.authorityService = authorityService;
+
     }
 
     @Override
