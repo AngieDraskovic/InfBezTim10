@@ -1,16 +1,13 @@
 package com.example.InfBezTim10.controller;
 
 import com.example.InfBezTim10.dto.*;
-import com.example.InfBezTim10.exception.EmailAlreadyExistsException;
-import com.example.InfBezTim10.exception.NotFoundException;
-import com.example.InfBezTim10.exception.UserNotActivatedException;
+import com.example.InfBezTim10.exception.*;
 import com.example.InfBezTim10.mapper.UserMapper;
+import com.example.InfBezTim10.model.PasswordReset;
 import com.example.InfBezTim10.model.User;
 import com.example.InfBezTim10.model.UserActivation;
 import com.example.InfBezTim10.security.JwtUtil;
-import com.example.InfBezTim10.service.ISendgridEmailService;
-import com.example.InfBezTim10.service.IUserActivationService;
-import com.example.InfBezTim10.service.IUserService;
+import com.example.InfBezTim10.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,17 +37,21 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
     private final IUserActivationService userActivationService;
     private final ISendgridEmailService sendgridEmailService;
+    private final IPasswordResetService passwordResetService;
+    private final ITwillioService twillioService;
     private final Random rand = new Random();
 
     @Autowired
     public UserController(IUserService userService, AuthenticationManager authenticationManager, JwtUtil jwtUtil, PasswordEncoder passwordEncoder, IUserActivationService userActivationService,
-                          ISendgridEmailService sendgridEmailService) {
+                          ISendgridEmailService sendgridEmailService, IPasswordResetService passwordResetService, ITwillioService twillioService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
         this.userActivationService = userActivationService;
         this.sendgridEmailService = sendgridEmailService;
+        this.passwordResetService = passwordResetService;
+        this.twillioService = twillioService;
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -73,12 +74,13 @@ public class UserController {
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO("Wrong username or password!"));
         } catch (UserNotActivatedException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
         }
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO,  @RequestParam String confirmationMethod
+    ) {
         try {
             User user = UserMapper.INSTANCE.userRegistrationDTOtoUser(userRegistrationDTO);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -87,20 +89,20 @@ public class UserController {
             UserDetailsDTO userDetailsDTO = UserMapper.INSTANCE.userToUserDetailsDTO(user);
 
             userActivationService.deleteIfAlreadyExists(user);
-            System.out.println("1");
             ZoneOffset desiredOffset = ZoneOffset.of("+04:00");
             ZonedDateTime zonedDateTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).withZoneSameInstant(desiredOffset);
             UserActivation activation = new UserActivation(String.valueOf(rand.nextInt(Integer.MAX_VALUE)), user,
                     zonedDateTime.toLocalDateTime());
             userActivationService.save(activation);
-            System.out.println("2");
-            sendgridEmailService.sendConfirmEmailMessage(user, activation.getActivationId());
-            System.out.println("3");
+            if (confirmationMethod.equalsIgnoreCase("email")) {
+                sendgridEmailService.sendConfirmEmailMessage(user, activation.getActivationId());
+            } else if (confirmationMethod.equalsIgnoreCase("sms")) {
+                twillioService.sendConfirmNumberSMS(user, activation.getActivationId());
+            }
             return ResponseEntity.status(HttpStatus.OK).body(userDetailsDTO);
         } catch (EmailAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -116,11 +118,41 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessageDTO("Successful account activation!"));
     }
 
-//    @GetMapping(value = "/resetPassword/{email}")
-//    public ResponseEntity<Void> sendEmailForPasswordReset(@PathVariable("email") String email){
-//        User user = userService.findByEmail(email);
-//
-//        userService.resetPassword(user.getEmail());
-//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//    }
+    @GetMapping(value = "/resetPassword/{email}")
+    public ResponseEntity<?> sendEmailForPasswordReset(@PathVariable("email") String email, @RequestParam String confirmationMethod){
+        try {
+            User user = userService.findByEmail(email);
+            passwordResetService.deleteIfAlreadyExists(user);
+            PasswordReset reset = new PasswordReset(String.valueOf(rand.nextInt(Integer.MAX_VALUE)), user, LocalDateTime.now());
+            passwordResetService.save(reset);
+            if (confirmationMethod.equalsIgnoreCase("email")) {
+                sendgridEmailService.sendNewPasswordMail(user, reset.getCode());
+            } else if (confirmationMethod.equalsIgnoreCase("sms")) {
+                twillioService.sendResetPasswordSMS(user, reset.getCode());
+            }
+
+            System.out.println("aaa");
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @PutMapping(value = "/resetPassword/{email}")
+    public ResponseEntity<?> resetPassword(@Valid @PathVariable("email") String email, @RequestBody ResetPasswordDTO passwordDTO){
+        try {
+            User user = userService.findByEmail(email);
+            passwordResetService.resetPassword(user, passwordDTO);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }catch(UserNotFoundException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));
+        } catch (PasswordDoNotMatchException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }

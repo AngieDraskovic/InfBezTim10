@@ -98,6 +98,11 @@
 			<artifactId>mapstruct</artifactId>
 			<version>1.5.3.Final</version>
 		</dependency>
+		<dependency>
+			<groupId>com.twilio.sdk</groupId>
+			<artifactId>twilio</artifactId>
+			<version>8.19.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.bouncycastle</groupId>

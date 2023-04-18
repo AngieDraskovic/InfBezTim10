@@ -12,6 +12,7 @@ import com.sendgrid.helpers.mail.objects.Email;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Service
 public class SendgridEmailService implements ISendgridEmailService {

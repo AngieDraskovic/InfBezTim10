@@ -12,5 +12,5 @@ public interface IPasswordResetRepository  extends MongoRepository<PasswordReset
     void deleteByUser(User user);
 
     @Query("{ 'code' : ?0 }")
-    UserActivation findByCode(String code);
+    PasswordReset findByCode(String code);
 }
