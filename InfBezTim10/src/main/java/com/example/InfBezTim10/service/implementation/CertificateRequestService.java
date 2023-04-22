@@ -41,41 +41,44 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         return certificateRequestRepository.findBySubjectUsername(username);
     }
 
+
+
     public CertificateRequest createCertificateRequest(CertificateRequestDTO certificateRequestDTO, String userRole, String currentUserEmail) throws CertificateGenerationException {
 
         CertificateRequest certificateRequest = CertificateRequestMapper.INSTANCE.certificateRequestDTOToCertificateRequest(certificateRequestDTO);
 
+        if(certificateRequest.getIssuerSN() == null)
+        {
+            throw new IllegalArgumentException("Root certificate can not be issued.");
+        }
+
         String cerificateEmail = "";
 
-        if (certificateRequestDTO.getIssuerSN() != null)
-        {
-            // Fetch the certificate by its serial number
-            Certificate issuerCertificate = certificateService.findBySerialNumber(certificateRequestDTO.getIssuerSN());
+        // Fetch the certificate by its serial number
+        Certificate issuerCertificate = certificateService.findBySerialNumber(certificateRequest.getIssuerSN());
 
-            if (issuerCertificate.getType() == CertificateType.END){
-                throw new IllegalArgumentException("Can not issue certificate based on end certificate.");
-            }
-            if (issuerCertificate.getStatus() == CertificateStatus.INVALID){
-                throw new IllegalArgumentException("Can not issue certificate based on invalid certificate.");
-            }
-
-            Date currentDate = new Date();
-
-            if (currentDate.before(issuerCertificate.getValidFrom()) || currentDate.after(issuerCertificate.getValidTo())) {
-                throw new IllegalArgumentException("Can not issue certificate based on invalid certificate.");
-            }
-
-            cerificateEmail = issuerCertificate.getUserEmail();
+        if (issuerCertificate == null) {
+            throw new IllegalArgumentException("Issuer certificate not found.");
         }
 
-        if(cerificateEmail.equals("") && !userRole.equals("ROLE_ADMIN"))
-        {
-            throw new IllegalArgumentException("Only admin can ask for root certificate.");
+        if (issuerCertificate.getType() == CertificateType.END){
+            throw new IllegalArgumentException("Can not issue certificate based on end certificate.");
         }
+
+        if (issuerCertificate.getStatus() == CertificateStatus.INVALID){
+            throw new IllegalArgumentException("Can not issue certificate based on invalid certificate.");
+        }
+
+        Date currentDate = new Date();
+
+        if (currentDate.before(issuerCertificate.getValidFrom()) || currentDate.after(issuerCertificate.getValidTo())) {
+            throw new IllegalArgumentException("Can not issue certificate based on invalid certificate.");
+        }
+
+        cerificateEmail = issuerCertificate.getUserEmail();
 
         // Set status based on the rules mentioned in the task
         if (cerificateEmail.equals(currentUserEmail) || userRole.equals("ROLE_ADMIN")) {
-
             certificateGeneratorService.issueCertificate(certificateRequest.getIssuerSN(), certificateRequest.getSubjectUsername(), certificateRequest.getKeyUsageFlags(), certificateRequest.getValidTo());
             certificateRequest.setStatus(CertificateRequestStatus.APPROVED);
         } else {
