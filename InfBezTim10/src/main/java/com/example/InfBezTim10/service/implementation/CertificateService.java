@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
-import java.util.Date;
 
 @Service
 public class CertificateService extends MongoService<Certificate> implements ICertificateService {
@@ -36,7 +35,7 @@ public class CertificateService extends MongoService<Certificate> implements ICe
     @Override
     public boolean validate(String serialNumber) {
         Certificate certificate = findBySerialNumber(serialNumber);
-        if (certificate.getStatus()!= CertificateStatus.VALID) {
+        if (certificate.getStatus() != CertificateStatus.VALID) {
             return false;
         }
         if (certificate.getValidTo().before(Calendar.getInstance().getTime())) {

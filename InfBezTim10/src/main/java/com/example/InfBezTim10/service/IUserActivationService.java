@@ -5,6 +5,8 @@ import com.example.InfBezTim10.model.User;
 import com.example.InfBezTim10.model.UserActivation;
 
 public interface IUserActivationService extends IJPAService<UserActivation>{
+    UserActivation create(User user) throws NotFoundException;
+
     void deleteIfAlreadyExists(User user);
 
     void activate(String activationId) throws NotFoundException;

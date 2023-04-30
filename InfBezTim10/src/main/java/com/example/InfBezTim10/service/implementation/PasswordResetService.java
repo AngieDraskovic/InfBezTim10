@@ -38,24 +38,24 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
 
 
     @Override
-    public void deleteIfAlreadyExists(User user){
+    public void deleteIfAlreadyExists(User user) {
         if (passwordResetRepository.existsByUser(user)) {
             passwordResetRepository.deleteByUser(user);
         }
     }
 
     @Override
-    public PasswordReset save(PasswordReset reset){
+    public PasswordReset save(PasswordReset reset) {
         return passwordResetRepository.save(reset);
     }
 
     @Override
     public void resetPassword(User user, ResetPasswordDTO resetPasswordDTO) throws PasswordDoNotMatchException {
         PasswordReset passwordReset = passwordResetRepository.findByCode(resetPasswordDTO.getCode());
-        if(passwordReset==null){
+        if (passwordReset == null) {
             throw new NotFoundException("Incorrect code! ");
         }
-        if(!resetPasswordDTO.getNewPassword().equals(resetPasswordDTO.getNewPasswordConfirm())){
+        if (!resetPasswordDTO.getNewPassword().equals(resetPasswordDTO.getNewPasswordConfirm())) {
             throw new PasswordDoNotMatchException("Passwords do not match!  ");
         }
 

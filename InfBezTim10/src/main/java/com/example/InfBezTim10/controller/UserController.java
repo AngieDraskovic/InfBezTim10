@@ -88,12 +88,8 @@ public class UserController {
             user = userService.register(user);
             UserDetailsDTO userDetailsDTO = UserMapper.INSTANCE.userToUserDetailsDTO(user);
 
-            userActivationService.deleteIfAlreadyExists(user);
-            ZoneOffset desiredOffset = ZoneOffset.of("+04:00");
-            ZonedDateTime zonedDateTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).withZoneSameInstant(desiredOffset);
-            UserActivation activation = new UserActivation(String.valueOf(rand.nextInt(Integer.MAX_VALUE)), user,
-                    zonedDateTime.toLocalDateTime());
-            userActivationService.save(activation);
+            UserActivation activation = userActivationService.create(user);
+
             if (confirmationMethod.equalsIgnoreCase("email")) {
                 sendgridEmailService.sendConfirmEmailMessage(user, activation.getActivationId());
             } else if (confirmationMethod.equalsIgnoreCase("sms")) {
@@ -131,7 +127,6 @@ public class UserController {
                 twillioService.sendResetPasswordSMS(user, reset.getCode());
             }
 
-            System.out.println("aaa");
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));
