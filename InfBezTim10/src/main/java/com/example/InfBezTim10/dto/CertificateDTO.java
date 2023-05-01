@@ -19,6 +19,8 @@ public class CertificateDTO {
 
     private CertificateType type;
 
+    private String serialNumber;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+02:00")
     private Date validFrom;
 
