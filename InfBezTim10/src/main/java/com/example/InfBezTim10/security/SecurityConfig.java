@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .requestMatchers(POST, "/api/certificate/issueCertificate").permitAll()
                 .requestMatchers(POST, "/api/user/login").permitAll()
                 .requestMatchers(POST, "/api/user/register").permitAll()
+                .requestMatchers(GET, "/api/user/me").permitAll()
                 .requestMatchers(GET, "/api/user/activate/**").permitAll()
                 .requestMatchers(GET, "/api/user/resetPassword/**").permitAll()
                 .requestMatchers(PUT, "/api/user/resetPassword/**").permitAll()
