@@ -34,13 +34,15 @@ public class CertificateGeneratorService implements ICertificateGeneratorService
 
     private final ICertificateService certificateService;
     private final IUserService userService;
+    private final CertificateFileUtils certificateFileUtils;
     private final CertificateGenerator certificateGenerator;
     private final CertificateConfigValidator configValidator;
 
     @Autowired
-    public CertificateGeneratorService(ICertificateService certificateService, IUserService userService, CertificateGenerator certificateGenerator, CertificateConfigValidator configValidator) {
+    public CertificateGeneratorService(ICertificateService certificateService, IUserService userService, CertificateFileUtils certificateFileUtils, CertificateGenerator certificateGenerator, CertificateConfigValidator configValidator) {
         this.certificateService = certificateService;
         this.userService = userService;
+        this.certificateFileUtils = certificateFileUtils;
         this.certificateGenerator = certificateGenerator;
         this.configValidator = configValidator;
     }
@@ -74,7 +76,7 @@ public class CertificateGeneratorService implements ICertificateGeneratorService
 
         X509Certificate issuerCertificate = null;
         if (issuer != null) {
-            issuerCertificate = CertificateFileUtils.readCertificate(issuer.getSerialNumber());
+            issuerCertificate = certificateFileUtils.readCertificate(issuer.getSerialNumber());
         }
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(4096);
@@ -109,7 +111,7 @@ public class CertificateGeneratorService implements ICertificateGeneratorService
 
         certificateService.save(certificateForDb);
 
-        CertificateFileUtils.writeCertificate(cert, certificateForDb.getSerialNumber());
+        certificateFileUtils.writeCertificate(cert, certificateForDb.getSerialNumber());
         CertificateFileUtils.writePrivateKey(config.getKeyPair().getPrivate(), certificateForDb.getSerialNumber());
 
         return certificateForDb;

@@ -1,10 +1,16 @@
 package com.example.InfBezTim10.utils;
 
+import com.example.InfBezTim10.exception.CertificateNotFoundException;
 import com.mongodb.client.gridfs.model.GridFSFile;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -25,9 +31,18 @@ public class CertificateFileUtils {
 
     private static final String CERT_DIR = "certs";
 
-    public static void writeCertificate(X509Certificate certificate, String serialNumber) throws IOException, CertificateEncodingException {
-        Path certificatePath = Paths.get(CERT_DIR, serialNumber + ".crt");
-        Files.write(certificatePath, certificate.getEncoded());
+    private final GridFsTemplate gridFsTemplate;
+
+    @Autowired
+    public CertificateFileUtils(GridFsTemplate gridFsTemplate) {
+        this.gridFsTemplate = gridFsTemplate;
+    }
+
+    public void writeCertificate(X509Certificate certificate, String serialNumber) throws CertificateEncodingException {
+        byte[] fileContent = certificate.getEncoded();
+        String fileName = serialNumber + ".crt";
+        String contentType = "application/x-x509-ca-cert";
+        gridFsTemplate.store(new ByteArrayInputStream(fileContent), fileName, contentType);
     }
 
     public X509Certificate readCertificate(String serialNumber) throws IOException, CertificateException {

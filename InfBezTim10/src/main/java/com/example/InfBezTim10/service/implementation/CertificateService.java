@@ -1,6 +1,5 @@
 package com.example.InfBezTim10.service.implementation;
 
-
 import com.example.InfBezTim10.exception.CertificateNotFoundException;
 import com.example.InfBezTim10.model.Certificate;
 import com.example.InfBezTim10.model.CertificateStatus;
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
 
 import java.util.Date;
 import java.util.List;
