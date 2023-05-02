@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -53,6 +55,15 @@ public class UserController {
         this.passwordResetService = passwordResetService;
         this.twillioService = twillioService;
     }
+
+
+    @GetMapping(value = "/me")
+    public ResponseEntity<UserMeDTO> userDTOResponseEntity(Principal principal) {
+        User user = userService.findByEmail(principal.getName());
+        UserMeDTO userMeDTO = new UserMeDTO(user);
+        return new ResponseEntity<>(userMeDTO, HttpStatus.OK);
+    }
+
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserCredentialsDTO userCredentialDTO) {
@@ -126,7 +137,6 @@ public class UserController {
             } else if (confirmationMethod.equalsIgnoreCase("sms")) {
                 twillioService.sendResetPasswordSMS(user, reset.getCode());
             }
-
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));

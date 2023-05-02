@@ -1,6 +1,7 @@
 package com.example.InfBezTim10.mapper;
 
 import com.example.InfBezTim10.dto.UserDetailsDTO;
+import com.example.InfBezTim10.dto.UserMeDTO;
 import com.example.InfBezTim10.dto.UserRegistrationDTO;
 import com.example.InfBezTim10.model.User;
 import org.mapstruct.Mapper;
@@ -14,4 +15,5 @@ public interface UserMapper {
     UserDetailsDTO userToUserDetailsDTO(User user);
     
     User userRegistrationDTOtoUser(UserRegistrationDTO userRegistrationDTO);
+
 }

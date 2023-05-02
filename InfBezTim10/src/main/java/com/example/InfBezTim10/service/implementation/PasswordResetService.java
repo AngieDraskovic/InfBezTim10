@@ -58,7 +58,6 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
         if (!resetPasswordDTO.getNewPassword().equals(resetPasswordDTO.getNewPasswordConfirm())) {
             throw new PasswordDoNotMatchException("Passwords do not match!  ");
         }
-
         user.setPassword(passwordEncoder.encode(resetPasswordDTO.getNewPassword()));
         userService.save(user);
         passwordResetRepository.delete(passwordReset);
