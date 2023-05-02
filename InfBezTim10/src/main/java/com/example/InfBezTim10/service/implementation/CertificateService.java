@@ -8,10 +8,11 @@ import com.example.InfBezTim10.repository.ICertificateRepository;
 import com.example.InfBezTim10.service.ICertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class CertificateService extends MongoService<Certificate> implements ICertificateService {
@@ -33,20 +34,13 @@ public class CertificateService extends MongoService<Certificate> implements ICe
         return certificate;
     }
 
-    @Override
-    public boolean validate(String serialNumber) {
-        Certificate certificate = findBySerialNumber(serialNumber);
-        if (certificate.getStatus()!= CertificateStatus.VALID) {
-            return false;
+    @Scheduled(cron = "0 0 0,12 * * ?")
+    public void validatePendingCertificates() {
+        List<Certificate> certificatesToBeValidated = certificateRepository.findCertificatesToBeValidated(new Date());
+        for (Certificate certificate : certificatesToBeValidated) {
+            certificate.setStatus(CertificateStatus.VALID);
+            certificateRepository.save(certificate);
         }
-        if (certificate.getValidTo().before(Calendar.getInstance().getTime())) {
-            certificate.setStatus(CertificateStatus.INVALID);
-            save(certificate);
-            return false;
-        }
-
-        return true;
-
     }
 
     protected MongoRepository<Certificate, String> getEntityRepository() {

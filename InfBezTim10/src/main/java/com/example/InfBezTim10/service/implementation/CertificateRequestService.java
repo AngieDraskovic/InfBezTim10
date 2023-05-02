@@ -1,4 +1,5 @@
 package com.example.InfBezTim10.service.implementation;
+
 import com.example.InfBezTim10.dto.CertificateRequestDTO;
 import com.example.InfBezTim10.exception.CertificateGenerationException;
 import com.example.InfBezTim10.exception.NotFoundException;
@@ -8,14 +9,12 @@ import com.example.InfBezTim10.repository.ICertificateRequestRepository;
 import com.example.InfBezTim10.service.ICertificateGeneratorService;
 import com.example.InfBezTim10.service.ICertificateRequestService;
 import com.example.InfBezTim10.service.ICertificateService;
-import org.bouncycastle.asn1.x509.KeyUsage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class CertificateRequestService extends MongoService<CertificateRequest>  implements ICertificateRequestService {
@@ -65,7 +64,7 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
             throw new IllegalArgumentException("Can not issue certificate based on end certificate.");
         }
 
-        if (issuerCertificate.getStatus() == CertificateStatus.INVALID){
+        if (issuerCertificate.getStatus() != CertificateStatus.VALID){
             throw new IllegalArgumentException("Can not issue certificate based on invalid certificate.");
         }
 
