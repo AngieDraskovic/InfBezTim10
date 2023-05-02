@@ -1,6 +1,6 @@
 package com.example.InfBezTim10.security;
 
-import com.example.InfBezTim10.service.IUserService;
+import com.example.InfBezTim10.service.userManagement.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package com.example.InfBezTim10.utils;
 
-import com.example.InfBezTim10.model.CertificateConfig;
+import com.example.InfBezTim10.model.certificate.CertificateConfig;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;

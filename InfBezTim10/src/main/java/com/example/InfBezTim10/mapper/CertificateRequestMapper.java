@@ -1,9 +1,7 @@
 package com.example.InfBezTim10.mapper;
 
-import com.example.InfBezTim10.dto.CertificateDTO;
-import com.example.InfBezTim10.dto.CertificateRequestDTO;
-import com.example.InfBezTim10.model.Certificate;
-import com.example.InfBezTim10.model.CertificateRequest;
+import com.example.InfBezTim10.dto.certificate.CertificateRequestDTO;
+import com.example.InfBezTim10.model.certificate.CertificateRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

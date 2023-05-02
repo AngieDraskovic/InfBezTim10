@@ -1,11 +1,10 @@
 package com.example.InfBezTim10.utils;
 
-import com.example.InfBezTim10.exception.InvalidCertificateConfigException;
-import com.example.InfBezTim10.model.Certificate;
-import com.example.InfBezTim10.model.CertificateConfig;
-import com.example.InfBezTim10.model.User;
+import com.example.InfBezTim10.exception.certificate.InvalidCertificateConfigException;
+import com.example.InfBezTim10.model.certificate.CertificateConfig;
+import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.repository.ICertificateRepository;
-import com.example.InfBezTim10.service.IUserService;
+import com.example.InfBezTim10.service.userManagement.IUserService;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.springframework.beans.factory.annotation.Autowired;
