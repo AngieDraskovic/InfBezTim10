@@ -1,10 +1,8 @@
 package com.example.InfBezTim10.service.implementation;
 
-import com.example.InfBezTim10.dto.ResetPasswordDTO;
 import com.example.InfBezTim10.exception.EmailAlreadyExistsException;
 import com.example.InfBezTim10.exception.UserNotFoundException;
 import com.example.InfBezTim10.model.AuthorityEnum;
-import com.example.InfBezTim10.model.PasswordReset;
 import com.example.InfBezTim10.model.User;
 import com.example.InfBezTim10.repository.IUserRepository;
 import com.example.InfBezTim10.service.IAuthorityService;
@@ -61,7 +59,6 @@ public class UserService extends MongoService<User> implements IUserService, Use
     protected MongoRepository<User, String> getEntityRepository() {
         return this.userRepository;
     }
-
 
 
 }
