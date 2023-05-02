@@ -1,28 +1,17 @@
 package com.example.InfBezTim10.controller;
 
-import com.example.InfBezTim10.dto.CertificateRequestDTO;
+import com.example.InfBezTim10.dto.certificate.CertificateRequestDTO;
 import com.example.InfBezTim10.dto.RejectionReasonDTO;
-import com.example.InfBezTim10.dto.ResponseMessageDTO;
-import com.example.InfBezTim10.dto.UserDetailsDTO;
-import com.example.InfBezTim10.exception.CertificateGenerationException;
-import com.example.InfBezTim10.exception.EmailAlreadyExistsException;
-import com.example.InfBezTim10.mapper.UserMapper;
-import com.example.InfBezTim10.model.Certificate;
-import com.example.InfBezTim10.model.CertificateRequest;
-import com.example.InfBezTim10.model.User;
-import com.example.InfBezTim10.repository.ICertificateRepository;
-import com.example.InfBezTim10.service.implementation.CertificateRequestService;
-import com.example.InfBezTim10.service.implementation.CertificateService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import com.example.InfBezTim10.exception.certificate.CertificateGenerationException;
+import com.example.InfBezTim10.model.certificate.Certificate;
+import com.example.InfBezTim10.model.certificate.CertificateRequest;
+import com.example.InfBezTim10.service.certificateManagement.implementation.CertificateRequestService;
+import com.example.InfBezTim10.service.certificateManagement.implementation.CertificateService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -65,8 +54,7 @@ public class CertificateRequestController {
     public ResponseEntity<Certificate> approveCertificateRequest(@PathVariable String requestId, Principal principal) {
         try {
             return ResponseEntity.ok(certificateRequestService.approveCertificateRequest(requestId, principal.getName()));
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -80,7 +68,6 @@ public class CertificateRequestController {
         certificateRequestService.rejectCertificateRequest(requestId, principal.getName(), rejectionReasonDTO.getReason());
         return ResponseEntity.noContent().build();
     }
-
 
 
 }

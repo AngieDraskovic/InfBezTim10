@@ -1,6 +1,6 @@
 package com.example.InfBezTim10.security;
 
-import com.example.InfBezTim10.service.IUserService;
+import com.example.InfBezTim10.service.userManagement.IUserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

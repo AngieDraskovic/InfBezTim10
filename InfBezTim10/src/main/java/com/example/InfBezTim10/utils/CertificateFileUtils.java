@@ -1,6 +1,6 @@
 package com.example.InfBezTim10.utils;
 
-import com.example.InfBezTim10.exception.CertificateNotFoundException;
+import com.example.InfBezTim10.exception.certificate.CertificateNotFoundException;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
