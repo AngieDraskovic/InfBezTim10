@@ -28,11 +28,13 @@ public class CertificateService extends MongoService<Certificate> implements ICe
 
     @Override
     public Certificate findBySerialNumber(String serialNumber) {
-        try {
-            return findById(serialNumber);
-        } catch (NotFoundException e) {
-            throw new CertificateNotFoundException("Certificate with serial number " + serialNumber + " not found.");
-        }
+        return certificateRepository.findBySerialNumber(serialNumber)
+                .orElseThrow(() -> new CertificateNotFoundException("Certificate with serial number " + serialNumber + " not found."));
+    }
+
+    @Override
+    public List<Certificate> findCertificatesSignedBy(String issuerSN) {
+        return certificateRepository.findCertificatesSignedBy(issuerSN);
     }
 
     @Scheduled(cron = "0 0 0,12 * * ?")

@@ -74,7 +74,7 @@ public class CertificateValidationService implements ICertificateValidationServi
         }
 
         Certificate issuerCert = certificateService.findBySerialNumber(currCert.getIssuer());
-        X509Certificate issuerX509Cert = certificateFileUtils.readCertificate(issuerCert.SerialNumber);
+        X509Certificate issuerX509Cert = certificateFileUtils.readCertificate(issuerCert.serialNumber);
         validateCertificateSignature(currX509Cert, issuerX509Cert);
         validateCertificateChain(issuerCert, issuerX509Cert);
     }

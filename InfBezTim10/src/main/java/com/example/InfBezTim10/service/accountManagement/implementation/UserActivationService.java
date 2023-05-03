@@ -2,7 +2,6 @@ package com.example.InfBezTim10.service.accountManagement.implementation;
 
 import com.example.InfBezTim10.exception.NotFoundException;
 import com.example.InfBezTim10.exception.user.UserActivationNotFoundException;
-import com.example.InfBezTim10.exception.user.UserNotFoundException;
 import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.model.user.UserActivation;
 import com.example.InfBezTim10.repository.IUserActivationRepository;
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -34,14 +32,8 @@ public class UserActivationService extends MongoService<UserActivation> implemen
     }
 
     @Override
-    protected MongoRepository<UserActivation, String> getEntityRepository() {
-        return this.userActivationRepository;
-    }
-
-    @Override
     public void activate(String activationId) throws NotFoundException {
-        UserActivation userActivation = userActivationRepository.findById(activationId).orElseThrow(() ->
-                new UserActivationNotFoundException("User activation not found"));
+        UserActivation userActivation = findByActivationId(activationId);
         User user = userActivation.getUser();
         user.setActive(Boolean.TRUE);
         userService.save(user);
@@ -63,5 +55,16 @@ public class UserActivationService extends MongoService<UserActivation> implemen
         if (userActivationRepository.existsByUser(user)) {
             userActivationRepository.deleteByUser(user);
         }
+    }
+
+    @Override
+    public UserActivation findByActivationId(String activationId) {
+        return userActivationRepository.findByActivationId(activationId)
+                .orElseThrow(() -> new UserActivationNotFoundException("Activation with id " + activationId + " not found!"));
+    }
+
+    @Override
+    protected MongoRepository<UserActivation, String> getEntityRepository() {
+        return this.userActivationRepository;
     }
 }

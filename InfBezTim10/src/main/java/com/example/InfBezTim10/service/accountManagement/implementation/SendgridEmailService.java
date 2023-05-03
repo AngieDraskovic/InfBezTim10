@@ -16,60 +16,69 @@ import java.io.IOException;
 @Service
 public class SendgridEmailService implements ISendgridEmailService {
 
-
-    @Override
-    public void sendConfirmEmailMessage(User toUser, String code) throws IOException {
-        Email from = new Email("tim961495@gmail.com");
+    public void sendConfirmEmailMessage(User toUser, String code) {
+        String fromEmail = "tim961495@gmail.com";
         String subject = "Confirm your email";
-        Email to = new Email(toUser.getEmail());
-        Content content = new Content("text/plain", "Dear " + toUser.getName() + ", \n\nTo finish your registration use this activation code: \n"
-                + code +  "\n\n" + "If you did not perform this registration please contact our support: \n" +
-                "support@tim10.com\n\n Best regards,\nTim10 team!");
-        Mail mail = new Mail(from, subject, to, content);
-        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
-        Request request = new Request();
-        try {
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
+        String toEmail = toUser.getEmail();
+        String messageBody = createEmailMessageBody(toUser.getName(), code);
 
-            Response response = sg.api(request);
-            if (response.getStatusCode() == 202) {
-                System.out.println("Email sent successfully!");
-            } else {
-                System.out.println("Failed to send email: " + response.getBody());
-            }
+        try {
+            sendEmail(fromEmail, subject, toEmail, messageBody);
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw ex;
         }
     }
-    @Override
-    public void sendNewPasswordMail(User toUser, String code) throws IOException {
-        Email from = new Email("tim961495@gmail.com");
+
+    private String createEmailMessageBody(String userName, String code) {
+        return "Dear " + userName + ",\n\nTo finish your registration, use this activation code:\n" +
+                code + "\n\nIf you did not perform this registration, please contact our support:\n" +
+                "support@tim10.com\n\nBest regards,\nTim10 team!";
+    }
+
+    public void sendNewPasswordMail(User toUser, String code) {
+        String fromEmail = "tim961495@gmail.com";
         String subject = "New Password Request";
-        Email to = new Email(toUser.getEmail());
-        Content content = new Content("text/plain", "Dear " + toUser.getName() + ", \n\nTo reset your password use this code: \n"
-                + code +  "\n\n" + "Best regards,\nTim10 team!");
-        Mail mail = new Mail(from, subject, to, content);
-        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
-        Request request = new Request();
-        try {
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
+        String toEmail = toUser.getEmail();
+        String messageBody = createNewPasswordEmailMessageBody(toUser.getName(), code);
 
-            Response response = sg.api(request);
-            if (response.getStatusCode() == 202) {
-                System.out.println("Email sent successfully!");
-            } else {
-                System.out.println("Failed to send email: " + response.getBody());
-            }
+        try {
+            sendEmail(fromEmail, subject, toEmail, messageBody);
         } catch (IOException ex) {
             ex.printStackTrace();
-            throw ex;
         }
     }
 
+    private String createNewPasswordEmailMessageBody(String userName, String code) {
+        return "Dear " + userName + ",\n\nTo reset your password, use this code:\n" +
+                code + "\n\nBest regards,\nTim10 team!";
+    }
 
+    private void sendEmail(String fromEmail, String subject, String toEmail, String messageBody) throws IOException {
+        Email from = new Email(fromEmail);
+        Email to = new Email(toEmail);
+        Content content = new Content("text/plain", messageBody);
+        Mail mail = new Mail(from, subject, to, content);
+
+        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
+        Request request = createSendGridRequest(mail);
+
+        Response response = sg.api(request);
+        handleResponse(response);
+    }
+
+    private Request createSendGridRequest(Mail mail) throws IOException {
+        Request request = new Request();
+        request.setMethod(Method.POST);
+        request.setEndpoint("mail/send");
+        request.setBody(mail.build());
+        return request;
+    }
+
+    private void handleResponse(Response response) {
+        if (response.getStatusCode() == 202) {
+            System.out.println("Email sent successfully!");
+        } else {
+            System.out.println("Failed to send email: " + response.getBody());
+        }
+    }
 }

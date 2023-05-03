@@ -1,12 +1,15 @@
 package com.example.InfBezTim10.controller;
 
+import com.example.InfBezTim10.dto.ResponseMessageDTO;
 import com.example.InfBezTim10.dto.certificate.CertificateDTO;
 import com.example.InfBezTim10.dto.certificate.CertificateRequestDTO;
 import com.example.InfBezTim10.exception.certificate.CertificateNotFoundException;
+import com.example.InfBezTim10.exception.certificate.CertificateValidationException;
 import com.example.InfBezTim10.mapper.CertificateMapper;
 import com.example.InfBezTim10.model.certificate.Certificate;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateGeneratorService;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateService;
+import com.example.InfBezTim10.service.certificateManagement.ICertificateValidationService;
 import com.example.InfBezTim10.utils.CertificateFileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
@@ -27,13 +31,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/certificate")
 public class CertificateController {
 
-    ICertificateService certificateService;
-    ICertificateGeneratorService certificateGeneratorService;
-    CertificateFileUtils certificateFileUtils;
+    private final ICertificateService certificateService;
+    private final ICertificateValidationService certificateValidationService;
+    private final ICertificateGeneratorService certificateGeneratorService;
+    private final CertificateFileUtils certificateFileUtils;
 
     @Autowired
-    public CertificateController(ICertificateService certificateService, ICertificateGeneratorService certificateGeneratorService, CertificateFileUtils certificateFileUtils) {
+    public CertificateController(ICertificateService certificateService, ICertificateValidationService certificateValidationService, ICertificateGeneratorService certificateGeneratorService, CertificateFileUtils certificateFileUtils) {
         this.certificateService = certificateService;
+        this.certificateValidationService = certificateValidationService;
         this.certificateGeneratorService = certificateGeneratorService;
         this.certificateFileUtils = certificateFileUtils;
     }
@@ -78,29 +84,29 @@ public class CertificateController {
     }
 
 
-//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-//    @GetMapping(value = "/validate/{serialNumber}")
-//    public ResponseEntity<?> validate(@PathVariable("serialNumber") String serialNumber) {
-//        try {
-//            boolean isValid = certificateService.validate(serialNumber);
-//            return ResponseEntity.status(HttpStatus.OK).body(isValid);
-//        } catch (CertificateNotFoundException e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
-//        }
-//    }
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping(value = "/validate/{serialNumber}")
+    public ResponseEntity<?> validate(@PathVariable("serialNumber") String serialNumber) {
+        try {
+            certificateValidationService.validate(serialNumber);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (CertificateNotFoundException | CertificateValidationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
+        }
+    }
 
-//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-//    @GetMapping(value = "/validateCopy")
-//    public ResponseEntity<?> validateCopy(@RequestParam("file") MultipartFile file) {
-//        if (file.isEmpty()) {
-//            return new ResponseEntity<>("File is empty", HttpStatus.BAD_REQUEST);
-//        }
-//
-//        try {
-//            boolean isValid = certificateService.validate(file);
-//            return ResponseEntity.status(HttpStatus.OK).body(isValid);
-//        } catch (CertificateNotFoundException | CertificateException | IOException e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
-//        }
-//    }
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping(value = "/validateCopy")
+    public ResponseEntity<?> validateCopy(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return new ResponseEntity<>("File is empty", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            certificateValidationService.validate(file);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (CertificateNotFoundException | CertificateValidationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
+        }
+    }
 }

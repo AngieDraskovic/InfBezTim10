@@ -15,4 +15,6 @@ public interface IPasswordResetService extends IJPAService<PasswordReset> {
     void sendEmail(String userEmail, String confirmationMethod) throws IOException;
 
     void resetPassword(String email, ResetPasswordDTO resetPasswordDTO) throws PasswordDoNotMatchException;
+
+    PasswordReset findByCode(String code);
 }

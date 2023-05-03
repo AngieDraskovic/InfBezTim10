@@ -2,6 +2,7 @@ package com.example.InfBezTim10.service.accountManagement.implementation;
 
 import com.example.InfBezTim10.dto.user.ResetPasswordDTO;
 import com.example.InfBezTim10.exception.user.PasswordDoNotMatchException;
+import com.example.InfBezTim10.exception.user.PasswordResetNotFoundException;
 import com.example.InfBezTim10.model.user.PasswordReset;
 import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.repository.IPasswordResetRepository;
@@ -63,7 +64,7 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
     @Override
     public void resetPassword(String userEmail, ResetPasswordDTO resetPasswordDTO) throws PasswordDoNotMatchException {
         User user = userService.findByEmail(userEmail);
-        PasswordReset passwordReset = findById(resetPasswordDTO.getCode());
+        PasswordReset passwordReset = findByCode(resetPasswordDTO.getCode());
 
         if (!resetPasswordDTO.getNewPassword().equals(resetPasswordDTO.getNewPasswordConfirm())) {
             throw new PasswordDoNotMatchException("Passwords do not match!  ");
@@ -72,6 +73,12 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
         user.setPassword(passwordEncoder.encode(resetPasswordDTO.getNewPassword()));
         userService.save(user);
         passwordResetRepository.delete(passwordReset);
+    }
+
+    @Override
+    public PasswordReset findByCode(String code) {
+        return passwordResetRepository.findByCode(code)
+                .orElseThrow(() -> new PasswordResetNotFoundException("Password reset for code " + code + " does not exist!"));
     }
 
     @Override

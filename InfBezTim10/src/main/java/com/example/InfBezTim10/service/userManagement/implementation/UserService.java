@@ -1,7 +1,7 @@
 package com.example.InfBezTim10.service.userManagement.implementation;
 
 import com.example.InfBezTim10.exception.NotFoundException;
-import com.example.InfBezTim10.exception.certificate.CertificateNotFoundException;
+import com.example.InfBezTim10.exception.user.UserNotFoundException;
 import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.repository.IUserRepository;
 import com.example.InfBezTim10.service.base.implementation.MongoService;
@@ -28,11 +28,8 @@ public class UserService extends MongoService<User> implements IUserService, Use
 
     @Override
     public User findByEmail(String email) {
-        try {
-            return findById(email);
-        } catch (NotFoundException e) {
-            throw new CertificateNotFoundException("User with email " + email + " not found.");
-        }
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found."));
     }
 
     @Override
