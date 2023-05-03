@@ -11,4 +11,6 @@ public interface IUserActivationService extends IJPAService<UserActivation> {
     void deleteIfAlreadyExists(User user);
 
     void activate(String activationId) throws NotFoundException;
+
+    UserActivation findByActivationId(String activationId);
 }

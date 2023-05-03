@@ -29,7 +29,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 @Component
 public class CertificateFileUtils {
 
-    private static final String CERT_DIR = "certs";
+    private static final String KEY_DIR = "keys";
 
     private final GridFsTemplate gridFsTemplate;
 
@@ -59,7 +59,7 @@ public class CertificateFileUtils {
     }
 
     public static PrivateKey readPrivateKey(String serialNumber) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        Path privateKeyPath = Paths.get(CERT_DIR, serialNumber + ".key");
+        Path privateKeyPath = Paths.get(KEY_DIR, serialNumber + ".key");
         byte[] privateKeyBytes = Files.readAllBytes(privateKeyPath);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -67,7 +67,7 @@ public class CertificateFileUtils {
     }
 
     public static void writePrivateKey(PrivateKey privateKey, String serialNumber) throws IOException {
-        Path privateKeyPath = Paths.get(CERT_DIR, serialNumber + ".key");
+        Path privateKeyPath = Paths.get(KEY_DIR, serialNumber + ".key");
         Files.write(privateKeyPath, privateKey.getEncoded());
     }
 

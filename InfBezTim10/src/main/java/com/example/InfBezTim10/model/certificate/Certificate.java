@@ -15,9 +15,9 @@ import java.util.Date;
 public class Certificate extends BaseEntity {
 
     @Indexed(unique = true)
-    public String SerialNumber;
-    public String SignatureAlgorithm;
-    public String Issuer;
+    public String serialNumber;
+    public String signatureAlgorithm;
+    public String issuer;
     public Date validFrom;
     public Date validTo;
     public CertificateStatus status;

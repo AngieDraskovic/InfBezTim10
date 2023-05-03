@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 import java.util.Optional;
 
 public interface IPasswordResetRepository  extends MongoRepository<PasswordReset, String> {
+    Optional<PasswordReset> findByCode(String code);
     boolean existsByUser(User user);
-
     void deleteByUser(User user);
 }
