@@ -15,6 +15,6 @@ public class UserCredentialsDTO {
     @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     private String email;
 
-    @Length(min = 6)
+    @Length(min = 6,  message = "Field password is not valid. Minimum length are 6 characters!")
     private String password;
 }

@@ -3,9 +3,7 @@ package com.example.InfBezTim10.controller;
 import com.example.InfBezTim10.dto.*;
 import com.example.InfBezTim10.dto.user.*;
 import com.example.InfBezTim10.exception.*;
-import com.example.InfBezTim10.exception.user.EmailAlreadyExistsException;
 import com.example.InfBezTim10.exception.user.PasswordDoNotMatchException;
-import com.example.InfBezTim10.exception.user.UserNotActivatedException;
 import com.example.InfBezTim10.exception.user.UserNotFoundException;
 import com.example.InfBezTim10.mapper.UserMapper;
 import com.example.InfBezTim10.model.user.User;
@@ -19,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,26 +55,16 @@ public class UserController {
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserCredentialsDTO userCredentialDTO) {
-        try {
-            var authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(userCredentialDTO.getEmail(),
-                            userCredentialDTO.getPassword())
-            );
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        var authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userCredentialDTO.getEmail(),
+                        userCredentialDTO.getPassword())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        userService.isUserVerified(userCredentialDTO.getEmail());
 
-            User user = userService.findByEmail(userCredentialDTO.getEmail());
-            if (!user.getActive()) {
-                throw new UserNotActivatedException("You have not confirmed your email/phone when registering");
-            }
-
-            String token = jwtUtil.generateToken(authentication);
-            AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
-            return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO("Wrong username or password!"));
-        } catch (UserNotActivatedException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
-        }
+        String token = jwtUtil.generateToken(authentication);
+        AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
+        return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,8 +73,6 @@ public class UserController {
         try {
             User user = userRegistrationService.registerUser(UserMapper.INSTANCE.userRegistrationDTOtoUser(userRegistrationDTO), confirmationMethod);
             return ResponseEntity.status(HttpStatus.OK).body(UserMapper.INSTANCE.userToUserDetailsDTO(user));
-        } catch (EmailAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -1,7 +1,8 @@
 package com.example.InfBezTim10.service.userManagement.implementation;
 
-import com.example.InfBezTim10.exception.NotFoundException;
+import com.example.InfBezTim10.exception.user.UserNotVerifiedException;
 import com.example.InfBezTim10.exception.user.UserNotFoundException;
+import com.example.InfBezTim10.model.user.AccountStatus;
 import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.repository.IUserRepository;
 import com.example.InfBezTim10.service.base.implementation.MongoService;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 public class UserService extends MongoService<User> implements IUserService, UserDetailsService {
@@ -27,14 +29,30 @@ public class UserService extends MongoService<User> implements IUserService, Use
     }
 
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found."));
+    public User findByEmail(String email) throws UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+        } else {
+            throw new UserNotFoundException("User with email " + email + " not found.");
+        }
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user = findByEmail(username);
+    public boolean emailExists(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    public void isUserVerified(String email) {
+        User user = findByEmail(email);
+        if (user.getAccountStatus() == AccountStatus.PENDING_VERIFICATION) {
+            throw new UserNotVerifiedException("User account is not verified.");
+        }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = findByEmail(email);
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 Arrays.asList(user.getAuthority()));
     }

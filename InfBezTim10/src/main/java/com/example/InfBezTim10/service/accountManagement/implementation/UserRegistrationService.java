@@ -1,5 +1,6 @@
 package com.example.InfBezTim10.service.accountManagement.implementation;
 
+import com.example.InfBezTim10.exception.user.EmailAlreadyExistsException;
 import com.example.InfBezTim10.model.user.AuthorityEnum;
 import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.model.user.UserActivation;
@@ -37,18 +38,21 @@ public class UserRegistrationService implements IUserRegistrationService {
 
     @Override
     public User registerUser(User user, String confirmationMethod) throws IOException {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setAuthority(authorityService.getAuthority(AuthorityEnum.USER));
-        user.setActive(false);
-        user = userService.save(user);
-        UserActivation activation = userActivationService.create(user);
+        if (userService.emailExists(user.getEmail())) {
+            throw new EmailAlreadyExistsException("Email already exists.");
+        } else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setAuthority(authorityService.getAuthority(AuthorityEnum.USER));
+            user = userService.save(user);
+            UserActivation activation = userActivationService.create(user);
 
-        if (confirmationMethod.equalsIgnoreCase("email")) {
-            sendgridEmailService.sendConfirmEmailMessage(user, activation.getId());
-        } else if (confirmationMethod.equalsIgnoreCase("sms")) {
-            twillioService.sendConfirmNumberSMS(user, activation.getId());
+//            if (confirmationMethod.equalsIgnoreCase("email")) {
+//                sendgridEmailService.sendConfirmEmailMessage(user, activation.getId());
+//            } else if (confirmationMethod.equalsIgnoreCase("sms")) {
+//                twillioService.sendConfirmNumberSMS(user, activation.getId());
+//            }
+
+            return user;
         }
-
-        return user;
     }
 }
