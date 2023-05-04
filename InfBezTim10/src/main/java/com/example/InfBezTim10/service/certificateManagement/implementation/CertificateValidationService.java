@@ -44,19 +44,7 @@ public class CertificateValidationService implements ICertificateValidationServi
         }
     }
 
-    @Override
-    public void validate(String certSN) throws CertificateValidationException {
-        try {
-            Certificate cert = certificateService.findBySerialNumber(certSN);
-            X509Certificate x509Cert = certificateFileUtils.readCertificate(certSN);
 
-            validateCertificateChain(cert, x509Cert);
-            validateExpiration(cert);
-            validateStatus(cert);
-        } catch (IOException | CertificateException e) {
-            throw new CertificateValidationException(e.getMessage(), e);
-        }
-    }
 
     private void validateCertificateChain(Certificate currCert, X509Certificate currX509Cert) throws CertificateValidationException, CertificateException, IOException {
         if (currCert == null) {
@@ -78,20 +66,21 @@ public class CertificateValidationService implements ICertificateValidationServi
         validateCertificateSignature(currX509Cert, issuerX509Cert);
         validateCertificateChain(issuerCert, issuerX509Cert);
     }
-
-    private void validateCertificateSignature(X509Certificate cert, X509Certificate issuerCert) throws CertificateValidationException {
+    
+    @Override
+    public void validate(String certSN) throws CertificateValidationException {
         try {
-            Signature signature = Signature.getInstance(cert.getSigAlgName());
-            signature.initVerify(issuerCert.getPublicKey());
-            signature.update(cert.getTBSCertificate());
-            if (!signature.verify(cert.getSignature())) {
-                throw new CertificateValidationException("Certificate signature is not valid!");
-            }
+            Certificate cert = certificateService.findBySerialNumber(certSN);
+            X509Certificate x509Cert = certificateFileUtils.readCertificate(certSN);
 
-        } catch (SignatureException | InvalidKeyException | NoSuchAlgorithmException | CertificateException e) {
-            throw new CertificateValidationException("Error occurred while validating certificate signature", e);
+            validateCertificateChain(cert, x509Cert);
+            validateExpiration(cert);
+            validateStatus(cert);
+        } catch (IOException | CertificateException e) {
+            throw new CertificateValidationException(e.getMessage(), e);
         }
     }
+
 
     private void validateExpiration(Certificate cert) throws CertificateValidationException {
         Date currentTime = Calendar.getInstance().getTime();
@@ -108,6 +97,20 @@ public class CertificateValidationService implements ICertificateValidationServi
     private void validateStatus(Certificate cert) throws CertificateValidationException {
         if (cert.getStatus() != CertificateStatus.VALID) {
             throw new CertificateValidationException("Certificate is not valid!");
+        }
+    }
+
+    private void validateCertificateSignature(X509Certificate cert, X509Certificate issuerCert) throws CertificateValidationException {
+        try {
+            Signature signature = Signature.getInstance(cert.getSigAlgName());
+            signature.initVerify(issuerCert.getPublicKey());
+            signature.update(cert.getTBSCertificate());
+            if (!signature.verify(cert.getSignature())) {
+                throw new CertificateValidationException("Certificate signature is not valid!");
+            }
+
+        } catch (SignatureException | InvalidKeyException | NoSuchAlgorithmException | CertificateException e) {
+            throw new CertificateValidationException("Error occurred while validating certificate signature", e);
         }
     }
 }
