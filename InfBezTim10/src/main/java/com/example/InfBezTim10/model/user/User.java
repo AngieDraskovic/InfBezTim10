@@ -23,11 +23,14 @@ public class User extends BaseEntity {
 
     private String telephoneNumber;
 
+    private AccountStatus accountStatus;
+
     @DBRef
     private Authority authority;
 
     public User() {
         super();
+        this.setAccountStatus(AccountStatus.PENDING_VERIFICATION);
     }
 
     public User(String name, String surname, String email, String password, String telephoneNumber) {
@@ -37,5 +40,7 @@ public class User extends BaseEntity {
         this.email = email;
         this.password = password;
         this.telephoneNumber = telephoneNumber;
+        this.setAccountStatus(AccountStatus.PENDING_VERIFICATION);
+
     }
 }

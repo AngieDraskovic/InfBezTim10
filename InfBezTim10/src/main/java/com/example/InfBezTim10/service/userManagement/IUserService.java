@@ -5,4 +5,8 @@ import com.example.InfBezTim10.service.base.IJPAService;
 
 public interface IUserService extends IJPAService<User> {
     User findByEmail(String email);
+
+    boolean emailExists(String email);
+
+    void isUserVerified(String email);
 }

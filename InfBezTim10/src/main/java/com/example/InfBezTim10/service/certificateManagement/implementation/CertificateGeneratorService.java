@@ -61,6 +61,7 @@ public class CertificateGeneratorService implements ICertificateGeneratorService
                 issuer = certificateService.findBySerialNumber(issuerSN);
             }
 
+
             User subject = userService.findByEmail(subjectUsername);
 
             CertificateConfig config = createCertificateConfig(issuer, subject, keyUsageFlags, validTo);
