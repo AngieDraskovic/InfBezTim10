@@ -59,7 +59,7 @@ public class CertificateController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @GetMapping(value = "/downloadCertificate/{serialNumber}")
+    @GetMapping(value = "/{serialNumber}/download")
     public ResponseEntity<?> downloadCertificate(@PathVariable("serialNumber") String serialNumber) {
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -85,28 +85,20 @@ public class CertificateController {
 
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @GetMapping(value = "/validate/{serialNumber}")
+    @GetMapping(value = "/{serialNumber}/validate")
     public ResponseEntity<?> validate(@PathVariable("serialNumber") String serialNumber) {
-        try {
-            certificateValidationService.validate(serialNumber);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (CertificateNotFoundException | CertificateValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
-        }
+        certificateValidationService.validate(serialNumber);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @GetMapping(value = "/validateCopy")
+    @PostMapping(value = "/validateCopy")
     public ResponseEntity<?> validateCopy(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return new ResponseEntity<>("File is empty", HttpStatus.BAD_REQUEST);
         }
 
-        try {
-            certificateValidationService.validate(file);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (CertificateNotFoundException | CertificateValidationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
-        }
+        certificateValidationService.validate(file);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
