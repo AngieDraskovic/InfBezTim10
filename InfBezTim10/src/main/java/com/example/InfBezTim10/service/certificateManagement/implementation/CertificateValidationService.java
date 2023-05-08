@@ -23,7 +23,7 @@ import java.util.Date;
 @Service
 public class CertificateValidationService implements ICertificateValidationService {
 
-    private static final String rootSN = "123456789";
+    private static final String rootSN = "d7ea19791499dc2e";
 
     private final CertificateFileUtils certificateFileUtils;
     private final CertificateService certificateService;
@@ -38,7 +38,7 @@ public class CertificateValidationService implements ICertificateValidationServi
     public void validate(MultipartFile file) throws CertificateValidationException {
         try {
             X509Certificate cert = certificateFileUtils.convertMultipartFileToX509Certificate(file);
-            validate(cert.getSerialNumber().toString());
+            validate(cert.getSerialNumber().toString(16));
         } catch (IOException | CertificateException e) {
             throw new CertificateValidationException("Certificate copy is not valid!", e);
         }

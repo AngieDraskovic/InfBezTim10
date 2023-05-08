@@ -1,6 +1,8 @@
 package com.example.InfBezTim10.exception;
 
 import com.example.InfBezTim10.dto.ErrorResponseDTO;
+import com.example.InfBezTim10.exception.certificate.CertificateNotFoundException;
+import com.example.InfBezTim10.exception.certificate.CertificateValidationException;
 import com.example.InfBezTim10.exception.user.EmailAlreadyExistsException;
 import com.example.InfBezTim10.exception.user.UserNotVerifiedException;
 import org.springframework.http.HttpStatus;
@@ -39,6 +41,26 @@ public class RestExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleEmailAlreadyExistsException(EmailAlreadyExistsException exception) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.CONFLICT.value(),
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({CertificateNotFoundException.class})
+    public ResponseEntity<ErrorResponseDTO> handleCertificateNotFoundException(CertificateNotFoundException exception) {
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.NOT_FOUND.value(),
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({CertificateValidationException.class})
+    public ResponseEntity<ErrorResponseDTO> handleCertificationValidationException(CertificateNotFoundException exception) {
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.BAD_REQUEST.value(),
                 exception.getMessage(),
                 System.currentTimeMillis()
         );

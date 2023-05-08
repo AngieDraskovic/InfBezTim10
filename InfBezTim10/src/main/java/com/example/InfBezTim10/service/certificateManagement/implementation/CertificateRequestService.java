@@ -50,8 +50,6 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
             throw new IllegalArgumentException("Root certificate can not be issued.");
         }
 
-        String cerificateEmail = "";
-
         // Fetch the certificate by its serial number
         Certificate issuerCertificate = certificateService.findBySerialNumber(certificateRequest.getIssuerSN());
 
@@ -73,10 +71,9 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
             throw new IllegalArgumentException("Can not issue certificate based on invalid certificate.");
         }
 
-        cerificateEmail = issuerCertificate.getUserEmail();
+        String certificateEmail = issuerCertificate.getUserEmail();
 
-        // Set status based on the rules mentioned in the task
-        if (cerificateEmail.equals(currentUserEmail) || userRole.equals("ROLE_ADMIN")) {
+        if (certificateEmail.equals(currentUserEmail) || userRole.equals("ROLE_ADMIN")) {
             certificateGeneratorService.issueCertificate(certificateRequest.getIssuerSN(), certificateRequest.getSubjectUsername(), certificateRequest.getKeyUsageFlags(), certificateRequest.getValidTo());
             certificateRequest.setStatus(CertificateRequestStatus.APPROVED);
         } else {
