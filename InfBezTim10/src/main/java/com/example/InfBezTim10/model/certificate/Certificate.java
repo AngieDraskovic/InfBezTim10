@@ -12,7 +12,7 @@ import java.util.Date;
 @Document(collection = "certificates")
 @Getter
 @Setter
-public class Certificate extends BaseEntity {
+public class    Certificate extends BaseEntity {
 
     @Indexed(unique = true)
     public String serialNumber;

@@ -9,4 +9,10 @@ public interface ICertificateService extends IJPAService<Certificate> {
     Certificate findBySerialNumber(String serialNumber);
 
     List<Certificate> findCertificatesSignedBy(String issuerSN);
+
+    List<Certificate> findCertificatesForUser(String email);
+
+    List<Certificate> findCertificatesIssuedByUser(String email);
+
+    void revokeCertificate(String serialNumber);
 }

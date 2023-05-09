@@ -12,11 +12,14 @@ import java.util.Optional;
 
 @Repository
 public interface ICertificateRepository extends MongoRepository<Certificate, String> {
-    @Query("{'SerialNumber': ?0}")
+    @Query("{'serialNumber': ?0}")
     Optional<Certificate> findBySerialNumber(String SN);
 
     @Query("{'issuerSN': ?0}")
     List<Certificate> findCertificatesSignedBy(String issuerSN);
+
+    @Query("{'userEmail': ?0}")
+    List<Certificate> findCertificatesForUser(String email);
 
     @Query("{ 'status' : 'pending', 'validFrom' : { $lte : ?0 }, 'validTo' : { $gt : ?0 } }")
     List<Certificate> findCertificatesToBeValidated(Date currentDate);

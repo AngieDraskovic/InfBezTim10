@@ -1,6 +1,8 @@
 package com.example.InfBezTim10.exception.certificate;
 
-public class CertificateGenerationException extends Exception {
+import com.example.InfBezTim10.exception.CustomException;
+
+public class CertificateGenerationException extends CustomException {
     public CertificateGenerationException(String message) {
         super(message);
     }

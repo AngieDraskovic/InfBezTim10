@@ -1,6 +1,6 @@
 package com.example.InfBezTim10.mapper;
 
-import com.example.InfBezTim10.dto.certificate.CertificateRequestDTO;
+import com.example.InfBezTim10.dto.certificateRequst.CreateCertificateRequestDTO;
 import com.example.InfBezTim10.model.certificate.CertificateRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -10,6 +10,8 @@ import org.mapstruct.factory.Mappers;
 public interface CertificateRequestMapper {
     CertificateRequestMapper INSTANCE = Mappers.getMapper(CertificateRequestMapper.class);
 
-    CertificateRequest certificateRequestDTOToCertificateRequest(CertificateRequestDTO certificateRequestDTO);
+    CertificateRequest createCertificateRequestDTOToCertificateRequest(CreateCertificateRequestDTO createCertificateRequestDTO);
+
+    CertificateRequest certificateToCertificateRequestDTO(CertificateRequest certificateRequest);
 
 }

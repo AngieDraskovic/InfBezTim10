@@ -1,10 +1,12 @@
 package com.example.InfBezTim10.controller;
 
-import com.example.InfBezTim10.dto.certificate.CertificateRequestDTO;
+import com.example.InfBezTim10.dto.certificateRequst.CreateCertificateRequestDTO;
 import com.example.InfBezTim10.dto.RejectionReasonDTO;
 import com.example.InfBezTim10.exception.certificate.CertificateGenerationException;
+import com.example.InfBezTim10.mapper.CertificateRequestMapper;
 import com.example.InfBezTim10.model.certificate.Certificate;
 import com.example.InfBezTim10.model.certificate.CertificateRequest;
+import com.example.InfBezTim10.service.certificateManagement.ICertificateService;
 import com.example.InfBezTim10.service.certificateManagement.implementation.CertificateRequestService;
 import com.example.InfBezTim10.service.certificateManagement.implementation.CertificateService;
 import org.springframework.http.ResponseEntity;
@@ -17,19 +19,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/certificate/request")
 public class CertificateRequestController {
-    private CertificateService certificateGenerator;
+    private ICertificateService certificateService;
     private CertificateRequestService certificateRequestService;
 
-    public CertificateRequestController(CertificateService certificateGenerator, CertificateRequestService certificateRequestService) {
-        this.certificateGenerator = certificateGenerator;
+    public CertificateRequestController(CertificateService certificateService, CertificateRequestService certificateRequestService) {
+        this.certificateService = certificateService;
         this.certificateRequestService = certificateRequestService;
     }
 
     @PostMapping("/create-user")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<?> createUserCertificateRequest(@RequestBody CertificateRequestDTO certificateRequestDTO, Principal principal) {
+    public ResponseEntity<?> createUserCertificateRequest(@RequestBody CreateCertificateRequestDTO createCertificateRequestDTO, Principal principal) {
         try {
-            return ResponseEntity.ok(certificateRequestService.createCertificateRequest(certificateRequestDTO, "ROLE_USER", principal.getName()));
+            CertificateRequest certificateRequest = CertificateRequestMapper.INSTANCE.createCertificateRequestDTOToCertificateRequest(createCertificateRequestDTO);
+            certificateRequest.setSubjectUsername(principal.getName());
+            return ResponseEntity.ok(certificateRequestService.createCertificateRequest(certificateRequest, "ROLE_USER", principal.getName()));
         } catch (CertificateGenerationException e) {
             throw new RuntimeException(e);
         }
@@ -37,17 +41,24 @@ public class CertificateRequestController {
 
     @PostMapping("/create-admin")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> createAdminCertificateRequest(@RequestBody CertificateRequestDTO certificateRequestDTO, Principal principal) {
+    public ResponseEntity<?> createAdminCertificateRequest(@RequestBody CreateCertificateRequestDTO createCertificateRequestDTO, Principal principal) {
         try {
-            return ResponseEntity.ok(certificateRequestService.createCertificateRequest(certificateRequestDTO, "ROLE_ADMIN", principal.getName()));
+            CertificateRequest certificateRequest = CertificateRequestMapper.INSTANCE.createCertificateRequestDTOToCertificateRequest(createCertificateRequestDTO);
+            certificateRequest.setSubjectUsername(principal.getName());
+            return ResponseEntity.ok(certificateRequestService.createCertificateRequest(certificateRequest, "ROLE_ADMIN", principal.getName()));
         } catch (CertificateGenerationException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @GetMapping("/user-requests")
-    public ResponseEntity<List<CertificateRequest>> getCertificateRequestsByUser(Principal principal) {
-        return ResponseEntity.ok(certificateRequestService.getCertificateRequestsByUser(principal.getName()));
+    @GetMapping("/outgoing-requests")
+    public ResponseEntity<List<CertificateRequest>> getOutgoingRequestsForUser(Principal principal) {
+        return ResponseEntity.ok(certificateRequestService.getOutgoingRequestsForUser(principal.getName()));
+    }
+
+    @GetMapping("/pending-incoming-requests")
+    public ResponseEntity<List<CertificateRequest>> getPendingIncomingRequestsForUser(Principal principal) {
+        return ResponseEntity.ok(certificateRequestService.getPendingIncomingRequestsForUser(principal.getName()));
     }
 
     @PutMapping("/{requestId}/approve")

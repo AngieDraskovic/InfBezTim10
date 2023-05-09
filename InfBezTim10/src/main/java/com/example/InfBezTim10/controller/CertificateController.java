@@ -1,11 +1,11 @@
 package com.example.InfBezTim10.controller;
 
-import com.example.InfBezTim10.dto.ResponseMessageDTO;
 import com.example.InfBezTim10.dto.certificate.CertificateDTO;
-import com.example.InfBezTim10.dto.certificate.CertificateRequestDTO;
+import com.example.InfBezTim10.dto.certificateRequst.CreateCertificateRequestDTO;
+import com.example.InfBezTim10.dto.user.UserDetailsDTO;
 import com.example.InfBezTim10.exception.certificate.CertificateNotFoundException;
-import com.example.InfBezTim10.exception.certificate.CertificateValidationException;
 import com.example.InfBezTim10.mapper.CertificateMapper;
+import com.example.InfBezTim10.mapper.CertificateRequestMapper;
 import com.example.InfBezTim10.model.certificate.Certificate;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateGeneratorService;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateService;
@@ -20,8 +20,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import java.io.IOException;
+import java.security.Principal;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -44,19 +44,21 @@ public class CertificateController {
         this.certificateFileUtils = certificateFileUtils;
     }
 
-    @PostMapping(value = "/issueCertificate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> issueCertificate(@RequestBody CertificateRequestDTO certificateRequestDTO) {
-        try {
-            Certificate certificate = certificateGeneratorService.issueCertificate(
-                    certificateRequestDTO.getIssuerSN(),
-                    certificateRequestDTO.getSubjectUsername(),
-                    certificateRequestDTO.getKeyUsageFlags(),
-                    certificateRequestDTO.getValidTo());
-            return new ResponseEntity<>(CertificateMapper.INSTANCE.certificateToCertificateDTO(certificate), HttpStatus.OK);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
+//    @PostMapping(value = "/issueCertificate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<?> issueCertificate(@RequestBody CreateCertificateRequestDTO createCertificateRequestDTO) {
+//        try {
+//
+//
+//            Certificate certificate = certificateGeneratorService.issueCertificate(
+//                    createCertificateRequestDTO.getIssuerSN(),
+//                    createCertificateRequestDTO.getSubjectUsername(),
+//                    createCertificateRequestDTO.getKeyUsageFlags(),
+//                    createCertificateRequestDTO.getValidTo());
+//            return new ResponseEntity<>(CertificateMapper.INSTANCE.certificateToCertificateDTO(certificate), HttpStatus.OK);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
+//    }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping(value = "/{serialNumber}/download")
@@ -83,6 +85,33 @@ public class CertificateController {
         return ResponseEntity.status(HttpStatus.OK).body(certificateDTOS);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping(value = "/owner")
+    public ResponseEntity<List<CertificateDTO>> getAllForUser(Principal principal) {
+        List<Certificate> certificateList = certificateService.findCertificatesForUser(principal.getName());
+        List<CertificateDTO> certificateDTOS = certificateList.stream()
+                .map(CertificateMapper.INSTANCE::certificateToCertificateDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(certificateDTOS);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping(value = "/issued")
+    public ResponseEntity<List<CertificateDTO>> getAllIssuedByUser(Principal principal) {
+        List<Certificate> certificateList = certificateService.findCertificatesIssuedByUser(principal.getName());
+        List<CertificateDTO> certificateDTOS = certificateList.stream()
+                .map(CertificateMapper.INSTANCE::certificateToCertificateDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.OK).body(certificateDTOS);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping(value = "/{serialNumber}")
+    public ResponseEntity<CertificateDTO> getBySerialNumber(@PathVariable String serialNumber) {
+        Certificate certificate = certificateService.findBySerialNumber(serialNumber);
+        CertificateDTO dto = CertificateMapper.INSTANCE.certificateToCertificateDTO(certificate);
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
+    }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping(value = "/{serialNumber}/validate")
@@ -99,6 +128,13 @@ public class CertificateController {
         }
 
         certificateValidationService.validate(file);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PutMapping(value = "/{serialNumber}/revoke")
+    public ResponseEntity<?> revokeCertificate(@PathVariable("serialNumber") String serialNumber) {
+        certificateService.revokeCertificate(serialNumber);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -17,8 +17,9 @@ public class CertificateRequest extends BaseEntity {
     @Indexed(unique = true)
     private String issuerSN;
     private String subjectUsername;
-    private String keyUsageFlags;
+    private CertificateType certificateType;
     private Date validTo;
+    private String keyUsageFlags;
     private CertificateRequestStatus status;
-    private String reason;
+    private String rejectionReason;
 }
