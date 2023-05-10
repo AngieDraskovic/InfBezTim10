@@ -2,6 +2,7 @@ package com.example.InfBezTim10.service.accountManagement.implementation;
 
 import com.example.InfBezTim10.exception.NotFoundException;
 import com.example.InfBezTim10.exception.user.UserActivationNotFoundException;
+import com.example.InfBezTim10.model.user.AccountStatus;
 import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.model.user.UserActivation;
 import com.example.InfBezTim10.repository.IUserActivationRepository;
@@ -36,6 +37,7 @@ public class UserActivationService extends MongoService<UserActivation> implemen
         UserActivation userActivation = findByActivationId(activationId);
         User user = userActivation.getUser();
         user.setActive(Boolean.TRUE);
+        user.setAccountStatus(AccountStatus.VERIFIED);
         userService.save(user);
         userActivationRepository.delete(userActivation);
     }
