@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Random;
 import java.time.LocalDateTime;
 
 @Service
@@ -27,6 +28,9 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
     private final ISendgridEmailService sendgridEmailService;
     private final ITwillioService twillioService;
     private final PasswordEncoder passwordEncoder;
+
+    private final Random rand = new Random();
+
 
     @Autowired
     public PasswordResetService(IPasswordResetRepository passwordResetRepository, IUserService userService, ISendgridEmailService sendgridEmailService, ITwillioService twillioService, PasswordEncoder passwordEncoder) {
@@ -52,6 +56,7 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
         PasswordReset reset = new PasswordReset();
         reset.setUser(user);
         reset.setCreationDate(LocalDateTime.now());
+        reset.setCode(String.valueOf(rand.nextInt(Integer.MAX_VALUE)));
         save(reset);
 
         if (confirmationMethod.equalsIgnoreCase("email")) {

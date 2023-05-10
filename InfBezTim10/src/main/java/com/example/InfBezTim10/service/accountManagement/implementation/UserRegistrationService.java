@@ -46,11 +46,11 @@ public class UserRegistrationService implements IUserRegistrationService {
             user = userService.save(user);
             UserActivation activation = userActivationService.create(user);
 
-//            if (confirmationMethod.equalsIgnoreCase("email")) {
-//                sendgridEmailService.sendConfirmEmailMessage(user, activation.getId());
-//            } else if (confirmationMethod.equalsIgnoreCase("sms")) {
-//                twillioService.sendConfirmNumberSMS(user, activation.getId());
-//            }
+            if (confirmationMethod.equalsIgnoreCase("email")){
+                sendgridEmailService.sendConfirmEmailMessage(user, activation.getActivationId());
+            } else if (confirmationMethod.equalsIgnoreCase("sms")) {
+                twillioService.sendConfirmNumberSMS(user, activation.getActivationId());
+            }
 
             return user;
         }
