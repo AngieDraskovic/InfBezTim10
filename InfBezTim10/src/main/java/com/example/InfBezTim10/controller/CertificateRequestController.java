@@ -45,7 +45,8 @@ public class CertificateRequestController {
         try {
             CertificateRequest certificateRequest = CertificateRequestMapper.INSTANCE.createCertificateRequestDTOToCertificateRequest(createCertificateRequestDTO);
             certificateRequest.setSubjectUsername(principal.getName());
-            return ResponseEntity.ok(certificateRequestService.createCertificateRequest(certificateRequest, "ROLE_ADMIN", principal.getName()));
+            CertificateRequest certificateRequest1 = certificateRequestService.createCertificateRequest(certificateRequest, "ROLE_ADMIN", principal.getName());
+            return ResponseEntity.ok(certificateRequest1);
         } catch (CertificateGenerationException e) {
             throw new RuntimeException(e);
         }

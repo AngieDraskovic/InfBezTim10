@@ -52,6 +52,19 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
     }
 
     public CertificateRequest createCertificateRequest(CertificateRequest certificateRequest, String userRole, String currentUserEmail) {
+
+        certificateRequest.setKeyUsageFlags(getKeyUsageFlags(certificateRequest.getCertificateType()));
+
+        if(certificateRequest.getCertificateType() == CertificateType.ROOT && !userRole.equals("ROLE_ADMIN"))
+        {
+            throw new IssuerCertificateNotFoundException("User can not get root certificate.");
+        }
+        if(certificateRequest.getCertificateType() == CertificateType.ROOT && userRole.equals("ROLE_ADMIN"))
+        {
+            certificateGeneratorService.issueCertificate(certificateRequest.getIssuerSN(), certificateRequest.getSubjectUsername(), certificateRequest.getKeyUsageFlags(), certificateRequest.getValidTo());
+            return certificateRequestRepository.save(certificateRequest);
+        }
+
         Certificate issuerCertificate = certificateService.findBySerialNumber(certificateRequest.getIssuerSN());
         validateCertificateRequest(certificateRequest, issuerCertificate);
         certificateRequest.setKeyUsageFlags(getKeyUsageFlags(certificateRequest.getCertificateType()));
