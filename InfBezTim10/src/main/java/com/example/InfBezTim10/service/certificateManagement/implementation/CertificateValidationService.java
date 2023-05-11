@@ -23,7 +23,7 @@ import java.util.Date;
 @Service
 public class CertificateValidationService implements ICertificateValidationService {
 
-    private static final String rootSN = "5b2b4cc6fa7119b9";
+    private static final String rootSN = "3d60168647599f8e";
 
     private final CertificateFileUtils certificateFileUtils;
     private final CertificateService certificateService;

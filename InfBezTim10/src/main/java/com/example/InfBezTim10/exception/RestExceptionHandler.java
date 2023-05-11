@@ -1,8 +1,7 @@
 package com.example.InfBezTim10.exception;
 
 import com.example.InfBezTim10.dto.ErrorResponseDTO;
-import com.example.InfBezTim10.exception.certificate.CertificateNotFoundException;
-import com.example.InfBezTim10.exception.certificate.CertificateValidationException;
+import com.example.InfBezTim10.exception.certificate.*;
 import com.example.InfBezTim10.exception.certificateRequest.CertificateRequestValidationException;
 import com.example.InfBezTim10.exception.user.EmailAlreadyExistsException;
 import com.example.InfBezTim10.exception.user.UserNotVerifiedException;
@@ -48,8 +47,8 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler({CertificateNotFoundException.class})
-    public ResponseEntity<ErrorResponseDTO> handleCertificateNotFoundException(CertificateNotFoundException exception) {
+    @ExceptionHandler({CertificateNotFoundException.class, PrivateKeyNotFoundException.class})
+    public ResponseEntity<ErrorResponseDTO> handleNotFoundException(Exception exception) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.NOT_FOUND.value(),
                 exception.getMessage(),
@@ -72,6 +71,16 @@ public class RestExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleCertificateRequestValidationException(CertificateRequestValidationException exception) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.BAD_REQUEST.value(),
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({CertificateReadException.class, PrivateKeyReadException.class})
+    public ResponseEntity<ErrorResponseDTO> handleReadException(Exception exception) {
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 exception.getMessage(),
                 System.currentTimeMillis()
         );
