@@ -15,7 +15,7 @@ public interface ICertificateRepository extends MongoRepository<Certificate, Str
     @Query("{'serialNumber': ?0}")
     Optional<Certificate> findBySerialNumber(String SN);
 
-    @Query("{'issuerSN': ?0}")
+    @Query("{'issuer': ?0}")
     List<Certificate> findCertificatesSignedBy(String issuerSN);
 
     @Query("{'userEmail': ?0}")

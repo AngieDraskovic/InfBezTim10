@@ -82,9 +82,9 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
 
     private String getKeyUsageFlags(CertificateType certificateType) {
         return switch (certificateType) {
-            case ROOT -> "1,3,5,7";
-            case INTERMEDIATE -> "1,3,5,7,8";
-            case END -> "1,3,5,7,9";
+            case ROOT -> "1,3,5,7,8";
+            case INTERMEDIATE -> "1,3,5,7";
+            case END -> "1";
         };
     }
 

@@ -95,7 +95,7 @@ public class CertificateGeneratorService implements ICertificateGeneratorService
         config.setIssuerCertificate(issuerCertificate);
         config.setKeyUsage(parseFlags(keyUsageFlags, config));
         config.setSignatureAlgorithm("SHA256WithRSAEncryption");
-        config.setSigningKey(issuerCertificate != null ? CertificateFileUtils.readPrivateKey(issuer.getSerialNumber()) : keyPair.getPrivate());
+        config.setSigningKey(issuerCertificate != null ? certificateFileUtils.readPrivateKey(issuer.getSerialNumber()) : keyPair.getPrivate());
 
         return config;
     }
@@ -116,7 +116,7 @@ public class CertificateGeneratorService implements ICertificateGeneratorService
         certificateService.save(certificateForDb);
 
         certificateFileUtils.writeCertificate(cert, certificateForDb.getSerialNumber());
-        CertificateFileUtils.writePrivateKey(config.getKeyPair().getPrivate(), certificateForDb.getSerialNumber());
+        certificateFileUtils.writePrivateKey(config.getKeyPair().getPrivate(), certificateForDb.getSerialNumber());
 
         return certificateForDb;
     }

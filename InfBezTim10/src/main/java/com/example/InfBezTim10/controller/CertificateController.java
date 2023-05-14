@@ -21,9 +21,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,35 +48,30 @@ public class CertificateController {
         this.certificateFileUtils = certificateFileUtils;
     }
 
-//    @PostMapping(value = "/issueCertificate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> issueCertificate(@RequestBody CreateCertificateRequestDTO createCertificateRequestDTO) {
-//        try {
-//
-//
-//            Certificate certificate = certificateGeneratorService.issueCertificate(
-//                    createCertificateRequestDTO.getIssuerSN(),
-//                    createCertificateRequestDTO.getSubjectUsername(),
-//                    createCertificateRequestDTO.getKeyUsageFlags(),
-//                    createCertificateRequestDTO.getValidTo());
-//            return new ResponseEntity<>(CertificateMapper.INSTANCE.certificateToCertificateDTO(certificate), HttpStatus.OK);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-//        }
-//    }
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping(value = "/{serialNumber}/download-certificate")
+    public ResponseEntity<?> downloadCertificate(@PathVariable("serialNumber") String serialNumber) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", serialNumber + ".crt");
+
+        X509Certificate certificate = certificateFileUtils.readCertificate(serialNumber);
+        try {
+            return new ResponseEntity<>(certificate.getEncoded(), headers, HttpStatus.OK);
+        } catch (CertificateEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @GetMapping(value = "/{serialNumber}/download")
-    public ResponseEntity<?> downloadCertificate(@PathVariable("serialNumber") String serialNumber) {
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", serialNumber + ".crt");
+    @GetMapping(value = "/{serialNumber}/download-private-key")
+    public ResponseEntity<?> downloadPrivateKey(@PathVariable("serialNumber") String serialNumber) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", serialNumber + ".key");
 
-            X509Certificate certificate = certificateFileUtils.readCertificate(serialNumber);
-            return new ResponseEntity<>(certificate.getEncoded(), headers, HttpStatus.OK);
-        } catch (CertificateException | IOException | CertificateNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
-        }
+        PrivateKey certificate = certificateFileUtils.readPrivateKey(serialNumber);
+        return new ResponseEntity<>(certificate.getEncoded(), headers, HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
