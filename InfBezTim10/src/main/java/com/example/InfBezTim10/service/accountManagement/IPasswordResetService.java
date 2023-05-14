@@ -1,5 +1,6 @@
 package com.example.InfBezTim10.service.accountManagement;
 
+import com.example.InfBezTim10.dto.user.RenewPasswordDTO;
 import com.example.InfBezTim10.dto.user.ResetPasswordDTO;
 import com.example.InfBezTim10.exception.user.PasswordDoNotMatchException;
 import com.example.InfBezTim10.model.user.PasswordReset;
@@ -17,4 +18,6 @@ public interface IPasswordResetService extends IJPAService<PasswordReset> {
     void resetPassword(String email, ResetPasswordDTO resetPasswordDTO) throws PasswordDoNotMatchException;
 
     PasswordReset findByCode(String code);
+
+    void renewPassword(String email, RenewPasswordDTO renewPasswordDTO) throws PasswordDoNotMatchException;
 }

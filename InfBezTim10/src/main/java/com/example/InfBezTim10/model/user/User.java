@@ -7,6 +7,11 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+
 @Document(collection = "users")
 @Getter
 @Setter
@@ -25,8 +30,13 @@ public class User extends BaseEntity {
 
     private AccountStatus accountStatus;
 
+    private List<String> previousPasswords;
+
     @DBRef
     private Authority authority;
+
+    private LocalDateTime lastPasswordResetDate;
+
 
     public User() {
         super();
@@ -41,6 +51,7 @@ public class User extends BaseEntity {
         this.password = password;
         this.telephoneNumber = telephoneNumber;
         this.setAccountStatus(AccountStatus.PENDING_VERIFICATION);
-
+        this.setLastPasswordResetDate(LocalDateTime.now());
+        this.setPreviousPasswords(new ArrayList<>());
     }
 }

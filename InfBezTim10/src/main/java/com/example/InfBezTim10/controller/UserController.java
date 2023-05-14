@@ -4,6 +4,8 @@ import com.example.InfBezTim10.dto.*;
 import com.example.InfBezTim10.dto.user.*;
 import com.example.InfBezTim10.exception.*;
 import com.example.InfBezTim10.exception.user.PasswordDoNotMatchException;
+import com.example.InfBezTim10.exception.user.PasswordExpiredException;
+import com.example.InfBezTim10.exception.user.PreviousPasswordException;
 import com.example.InfBezTim10.exception.user.UserNotFoundException;
 import com.example.InfBezTim10.mapper.UserMapper;
 import com.example.InfBezTim10.model.user.User;
@@ -55,23 +57,28 @@ public class UserController {
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserCredentialsDTO userCredentialDTO) {
-        var authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userCredentialDTO.getEmail(),
-                        userCredentialDTO.getPassword())
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        userService.isUserVerified(userCredentialDTO.getEmail());
+        try {
+            var authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userCredentialDTO.getEmail(),
+                            userCredentialDTO.getPassword())
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String token = jwtUtil.generateToken(authentication);
-        AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
-        return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
+            userService.isUserVerified(userCredentialDTO.getEmail());
+            userService.checkPasswordExpiration(userCredentialDTO.getEmail());
+
+            String token = jwtUtil.generateToken(authentication);
+            AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
+            return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
+        }catch(PasswordExpiredException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));
+        }
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO, @RequestParam String confirmationMethod
     ) {
         try {
-            System.out.println("hey hey hey");
             User user = userRegistrationService.registerUser(UserMapper.INSTANCE.userRegistrationDTOtoUser(userRegistrationDTO), confirmationMethod);
             return ResponseEntity.status(HttpStatus.OK).body(UserMapper.INSTANCE.userToUserDetailsDTO(user));
         } catch (IOException e) {
@@ -110,10 +117,21 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));
-        } catch (PasswordDoNotMatchException e) {
+        } catch (PasswordDoNotMatchException | PreviousPasswordException e) {
             throw new RuntimeException(e);
         }
     }
 
-
+    @PutMapping(value="/renewPassword/{email}")
+    public ResponseEntity<?> renewPassword(@Valid @PathVariable("email") String email, @RequestBody RenewPasswordDTO passwordDTO) {
+        try {
+            passwordResetService.renewPassword(email, passwordDTO);
+            SecurityContextHolder.clearContext();
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));
+        } catch (PasswordDoNotMatchException | PreviousPasswordException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
+        }
+    }
 }
