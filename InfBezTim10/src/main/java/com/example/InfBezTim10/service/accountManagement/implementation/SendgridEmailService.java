@@ -48,11 +48,27 @@ public class SendgridEmailService implements ISendgridEmailService {
         }
     }
 
+    public void sendTwoFactorAuthCodeMail(User toUser, String code){
+        String fromEmail = "tim961495@gmail.com";
+        String subject = "Two Factor Authentication";
+        String toEmail = toUser.getEmail();
+        String messageBody =createAuthenticationEmailMessageBody(toUser.getName(), code);
+        try {
+            sendEmail(fromEmail, subject, toEmail, messageBody);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private String createNewPasswordEmailMessageBody(String userName, String code) {
         return "Dear " + userName + ",\n\nTo reset your password, use this code:\n" +
                 code + "\n\nBest regards,\nTim10 team!";
     }
 
+    private String createAuthenticationEmailMessageBody(String userName, String code) {
+        return "Dear " + userName + ",\n\nTo login, use this code:\n" +
+                code + "\n\nBest regards,\nTim10 team!";
+    }
     private void sendEmail(String fromEmail, String subject, String toEmail, String messageBody) throws IOException {
         Email from = new Email(fromEmail);
         Email to = new Email(toEmail);

@@ -12,26 +12,32 @@ public class TwillioService implements ITwillioService {
     @Override
     public void sendConfirmNumberSMS(User user, String activationId){
         Twilio.init(System.getenv("ACCOUNT_SID"),System.getenv("AUTH_TOKEN"));
-
         String body = "To confirm your phone number please use this code:\n\n" + activationId;
         PhoneNumber from = new PhoneNumber("+16206369991");
         PhoneNumber to = new PhoneNumber(user.getTelephoneNumber());
-
         Message message = Message.creator(to, from, body).create();
         System.out.println(message.getSid());
     }
 
     @Override
     public void sendResetPasswordSMS(User user, String code){
-        System.out.println("cao");
         Twilio.init(System.getenv("ACCOUNT_SID"),System.getenv("AUTH_TOKEN"));
-        System.out.println((System.getenv("ACCOUNT_SID") + " " + System.getenv("AUTH_TOKEN")));
         String body = "To reset your password use this code:\n\n" + code;
         PhoneNumber from = new PhoneNumber("+16206369991");
         PhoneNumber to = new PhoneNumber(user.getTelephoneNumber());
-        System.out.println("cao");
         Message message = Message.creator(to, from, body).create();
-        System.out.println("cao");
         System.out.println(message.getSid());
+    }
+
+
+    @Override
+    public void sendTwoFactorAuthCodeSMS(User user, String code){
+        Twilio.init(System.getenv("ACCOUNT_SID"),System.getenv("AUTH_TOKEN"));
+        String body = "To login in use this code:\n\n" + code;
+        PhoneNumber from = new PhoneNumber("+16206369991");
+        PhoneNumber to = new PhoneNumber(user.getTelephoneNumber());
+        Message message = Message.creator(to, from, body).create();
+        System.out.println(message.getSid());
+
     }
 }

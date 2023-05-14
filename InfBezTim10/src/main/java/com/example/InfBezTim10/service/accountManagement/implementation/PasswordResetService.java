@@ -2,6 +2,7 @@ package com.example.InfBezTim10.service.accountManagement.implementation;
 
 import com.example.InfBezTim10.dto.user.RenewPasswordDTO;
 import com.example.InfBezTim10.dto.user.ResetPasswordDTO;
+import com.example.InfBezTim10.exception.user.IncorrectCodeException;
 import com.example.InfBezTim10.exception.user.PasswordDoNotMatchException;
 import com.example.InfBezTim10.exception.user.PasswordResetNotFoundException;
 import com.example.InfBezTim10.exception.user.PreviousPasswordException;
@@ -76,6 +77,9 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
     public void resetPassword(String userEmail, ResetPasswordDTO resetPasswordDTO) throws PasswordDoNotMatchException {
         User user = userService.findByEmail(userEmail);
         PasswordReset passwordReset = findByCode(resetPasswordDTO.getCode());
+        if(!passwordReset.getUser().equals(user)){
+            throw new IncorrectCodeException("Incorrect code!  ");
+        }
         if (!resetPasswordDTO.getNewPassword().equals(resetPasswordDTO.getNewPasswordConfirm())) {
             throw new PasswordDoNotMatchException("Passwords do not match!  ");
         }
