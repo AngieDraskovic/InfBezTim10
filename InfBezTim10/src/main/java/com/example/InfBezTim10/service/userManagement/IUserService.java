@@ -9,4 +9,6 @@ public interface IUserService extends IJPAService<User> {
     boolean emailExists(String email);
 
     void isUserVerified(String email);
+
+    void checkPasswordExpiration(String email);
 }

@@ -1,5 +1,6 @@
 package com.example.InfBezTim10.service.userManagement.implementation;
 
+import com.example.InfBezTim10.exception.user.PasswordExpiredException;
 import com.example.InfBezTim10.exception.user.UserNotVerifiedException;
 import com.example.InfBezTim10.exception.user.UserNotFoundException;
 import com.example.InfBezTim10.model.user.AccountStatus;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -51,11 +53,23 @@ public class UserService extends MongoService<User> implements IUserService, Use
     }
 
     @Override
+    public void checkPasswordExpiration(String email) {
+        User user = findByEmail(email);
+        LocalDateTime lastResetDate = user.getLastPasswordResetDate();
+        LocalDateTime expirationDate = lastResetDate.plusDays(30);
+       // LocalDateTime expirationDate = lastResetDate.plusMinutes(2);    // TODO: ova vrijednost samo za provjere
+        if (expirationDate.isBefore(LocalDateTime.now())){
+            throw new PasswordExpiredException("Your password has expired. Please enter a new one. ");
+        }
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = findByEmail(email);
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 Arrays.asList(user.getAuthority()));
     }
+
 
     @Override
     protected MongoRepository<User, String> getEntityRepository() {
