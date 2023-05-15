@@ -8,4 +8,5 @@ public interface ISendgridEmailService {
 
     void sendConfirmEmailMessage(User toUser, String code) throws IOException;
     void sendNewPasswordMail(User toUser, String code) throws IOException;
+    void sendTwoFactorAuthCodeMail(User user, String code) throws IOException;
 }
