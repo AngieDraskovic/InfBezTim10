@@ -1,5 +1,6 @@
 package com.example.InfBezTim10.controller;
 
+import com.example.InfBezTim10.dto.PaginatedResponse;
 import com.example.InfBezTim10.dto.certificate.CertificateDTO;
 import com.example.InfBezTim10.dto.certificateRequst.CreateCertificateRequestDTO;
 import com.example.InfBezTim10.dto.user.UserDetailsDTO;
@@ -7,11 +8,16 @@ import com.example.InfBezTim10.exception.certificate.CertificateNotFoundExceptio
 import com.example.InfBezTim10.mapper.CertificateMapper;
 import com.example.InfBezTim10.mapper.CertificateRequestMapper;
 import com.example.InfBezTim10.model.certificate.Certificate;
+import com.example.InfBezTim10.model.certificate.CertificateStatus;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateGeneratorService;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateService;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateValidationService;
 import com.example.InfBezTim10.utils.CertificateFileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,6 +35,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -85,23 +92,21 @@ public class CertificateController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @GetMapping(value = "/owner")
-    public ResponseEntity<List<CertificateDTO>> getAllForUser(Principal principal) {
-        List<Certificate> certificateList = certificateService.findCertificatesForUser(principal.getName());
-        List<CertificateDTO> certificateDTOS = certificateList.stream()
-                .map(CertificateMapper.INSTANCE::certificateToCertificateDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(certificateDTOS);
+    @GetMapping("/paginated")
+    public ResponseEntity<PaginatedResponse<CertificateDTO>> getAllPaged(Pageable pageable) {
+        Page<Certificate> certificatesPage = certificateService.findAll(pageable);
+        PaginatedResponse<CertificateDTO> response = pageToPaginatedResponse(certificatesPage, CertificateMapper.INSTANCE::certificateToCertificateDTO);
+
+        return ResponseEntity.ok(response);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @GetMapping(value = "/issued")
-    public ResponseEntity<List<CertificateDTO>> getAllIssuedByUser(Principal principal) {
-        List<Certificate> certificateList = certificateService.findCertificatesIssuedByUser(principal.getName());
-        List<CertificateDTO> certificateDTOS = certificateList.stream()
-                .map(CertificateMapper.INSTANCE::certificateToCertificateDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.status(HttpStatus.OK).body(certificateDTOS);
+    @GetMapping(value = "/owner")
+    public ResponseEntity<PaginatedResponse<CertificateDTO>> getAllForUser(Principal principal, Pageable pageable) {
+        Page<Certificate> certificatesPage = certificateService.findCertificatesForUser(principal.getName(), pageable);
+        PaginatedResponse<CertificateDTO> response = pageToPaginatedResponse(certificatesPage, CertificateMapper.INSTANCE::certificateToCertificateDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
@@ -135,5 +140,28 @@ public class CertificateController {
     public ResponseEntity<?> revokeCertificate(@PathVariable("serialNumber") String serialNumber) {
         certificateService.revokeCertificate(serialNumber);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping("/count/all")
+    public ResponseEntity<Long> countAllCertificates() {
+        long count = certificateService.countAllCertificates();
+        return ResponseEntity.ok(count);
+    }
+
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @GetMapping("/count/status")
+    public ResponseEntity<Long> countCertificatesByStatus(@RequestParam CertificateStatus status) {
+        Long count = certificateService.countCertificatesByStatus(status);
+        return ResponseEntity.ok(count);
+    }
+
+    private <T, U> PaginatedResponse<U> pageToPaginatedResponse(Page<T> page, Function<T, U> mapper) {
+        return new PaginatedResponse<>(
+                page.getContent().stream().map(mapper).collect(Collectors.toList()),
+                page.getTotalElements(),
+                page.getTotalPages()
+        );
     }
 }

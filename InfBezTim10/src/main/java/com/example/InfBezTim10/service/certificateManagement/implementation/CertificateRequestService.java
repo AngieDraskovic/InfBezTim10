@@ -10,6 +10,8 @@ import com.example.InfBezTim10.service.certificateManagement.ICertificateRequest
 import com.example.InfBezTim10.service.certificateManagement.ICertificateService;
 import com.example.InfBezTim10.service.base.implementation.MongoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
@@ -38,29 +40,29 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
     }
 
     @Override
-    public List<CertificateRequest> getOutgoingRequestsForUser(String username) {
-        return certificateRequestRepository.findBySubjectUsername(username);
+    public Page<CertificateRequest> getByUsername(String username, Pageable pageable) {
+        return certificateRequestRepository.findBySubjectUsername(username, pageable);
     }
 
     @Override
-    public List<CertificateRequest> getPendingIncomingRequestsForUser(String userEmail) {
+    public Page<CertificateRequest> getByStatusAndUsername(CertificateRequestStatus status, String userEmail, Pageable pageable) {
         List<String> issuerSerialNumbers = certificateService.findCertificatesForUser(userEmail)
                 .stream()
                 .map(Certificate::getSerialNumber)
                 .collect(Collectors.toList());
-        return certificateRequestRepository.findPendingIncomingRequestsByIssuerSerialNumbers(issuerSerialNumbers);
+        return certificateRequestRepository.findRequestsByStatusAndIssuerSerialNumbers(status, issuerSerialNumbers, pageable);
     }
 
     public CertificateRequest createCertificateRequest(CertificateRequest certificateRequest, String userRole, String currentUserEmail) {
 
         certificateRequest.setKeyUsageFlags(getKeyUsageFlags(certificateRequest.getCertificateType()));
 
-        if(certificateRequest.getCertificateType() == CertificateType.ROOT && !userRole.equals("ROLE_ADMIN"))
-        {
+        if (certificateRequest.getCertificateType() == CertificateType.ROOT && !userRole.equals("ROLE_ADMIN")) {
             throw new IssuerCertificateNotFoundException("User can not get root certificate.");
         }
-        if(certificateRequest.getCertificateType() == CertificateType.ROOT && userRole.equals("ROLE_ADMIN"))
-        {
+
+        if (certificateRequest.getCertificateType() == CertificateType.ROOT && userRole.equals("ROLE_ADMIN")) {
+            certificateRequest.setStatus(CertificateRequestStatus.APPROVED);
             certificateGeneratorService.issueCertificate(certificateRequest.getIssuerSN(), certificateRequest.getSubjectUsername(), certificateRequest.getKeyUsageFlags(), certificateRequest.getValidTo());
             return certificateRequestRepository.save(certificateRequest);
         }
@@ -147,7 +149,5 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
 
         return request;
     }
-
-
 }
 

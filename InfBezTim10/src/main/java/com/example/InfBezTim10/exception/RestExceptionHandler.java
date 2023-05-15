@@ -3,6 +3,8 @@ package com.example.InfBezTim10.exception;
 import com.example.InfBezTim10.dto.ErrorResponseDTO;
 import com.example.InfBezTim10.exception.certificate.*;
 import com.example.InfBezTim10.exception.certificateRequest.CertificateRequestValidationException;
+import com.example.InfBezTim10.exception.certificateRequest.EndCertificateUsageException;
+import com.example.InfBezTim10.exception.certificateRequest.IssuerCertificateNotFoundException;
 import com.example.InfBezTim10.exception.user.EmailAlreadyExistsException;
 import com.example.InfBezTim10.exception.user.UserNotVerifiedException;
 import org.springframework.http.HttpStatus;
