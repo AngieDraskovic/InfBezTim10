@@ -63,7 +63,7 @@ public class UserController {
 
 
     @PostMapping(value = "/verify", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> sendAuthCode(@Valid @RequestBody UserCredentialsDTO userCredentialDTO,  @RequestParam String confirmationMethod, HttpSession session) {
+    public ResponseEntity<?> sendAuthCode(@Valid @RequestBody UserCredentialsDTO userCredentialDTO, @RequestParam String confirmationMethod, HttpSession session) {
         try {
             var authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userCredentialDTO.getEmail(), userCredentialDTO.getPassword())
@@ -79,10 +79,10 @@ public class UserController {
             session.setAttribute("authentication", authentication);
 
             return ResponseEntity.ok().body(new ResponseMessageDTO("Verification code sent. Please enter the code to complete the login."));
-        }catch(PasswordExpiredException e) {
+        } catch (PasswordExpiredException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));
-        }catch (AuthenticationException e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO("Wrong username or password!"));
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO("Wrong username or password!"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -97,11 +97,26 @@ public class UserController {
             String token = jwtUtil.generateToken(authentication);
             AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
             return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
-        }catch(TwoFactorCodeNotFoundException e){
+        } catch (TwoFactorCodeNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));
-        }catch(IncorrectCodeException e){
+        } catch (IncorrectCodeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
         }
+    }
+
+//    Testiranje
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> login(@Valid @RequestBody UserCredentialsDTO userCredentialDTO) {
+        var authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userCredentialDTO.getEmail(),
+                        userCredentialDTO.getPassword())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        userService.isUserVerified(userCredentialDTO.getEmail());
+
+        String token = jwtUtil.generateToken(authentication);
+        AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
+        return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -146,12 +161,12 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));
-        } catch (PasswordDoNotMatchException | PreviousPasswordException  | IncorrectCodeException e) {
+        } catch (PasswordDoNotMatchException | PreviousPasswordException | IncorrectCodeException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @PutMapping(value="/renewPassword/{email}")
+    @PutMapping(value = "/renewPassword/{email}")
     public ResponseEntity<?> renewPassword(@Valid @PathVariable("email") String email, @RequestBody RenewPasswordDTO passwordDTO) {
         try {
             passwordResetService.renewPassword(email, passwordDTO);
