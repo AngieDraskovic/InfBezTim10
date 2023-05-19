@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class JwtUtil {
-    private Integer tokenValidity = 3600 * 24;
+    private Integer tokenValidity = 60*10;
     private String SECRET_KEY = "secret";
     private String authoritiesKey = "role";
     private final IUserService userService;

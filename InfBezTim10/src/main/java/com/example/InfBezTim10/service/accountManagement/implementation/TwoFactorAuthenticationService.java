@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Random;
 
-import static org.hibernate.internal.util.SerializationHelper.serialize;
 
 @Service
 public class TwoFactorAuthenticationService extends MongoService<TwoFactorAuth> implements ITwoFactorAuthenticationService{

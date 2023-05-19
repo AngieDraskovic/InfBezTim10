@@ -9,6 +9,7 @@ import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.security.JwtUtil;
 import com.example.InfBezTim10.service.accountManagement.*;
 import com.example.InfBezTim10.service.userManagement.*;
+import com.example.InfBezTim10.service.userManagement.implementation.RecaptchaService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,15 +36,15 @@ public class UserController {
     private final IUserActivationService userActivationService;
     private final IPasswordResetService passwordResetService;
     private final AuthenticationManager authenticationManager;
-
-
+    private final IRecaptchaService recaptchaService;
     private final ITwoFactorAuthenticationService twoFactorAuthenticationService;
     private final JwtUtil jwtUtil;
 
     @Autowired
     public UserController(IUserService userService, IUserRegistrationService userRegistrationService,
                           IUserActivationService userActivationService, IPasswordResetService passwordResetService,
-                          AuthenticationManager authenticationManager, JwtUtil jwtUtil, ITwoFactorAuthenticationService twoFactorAuthenticationService) {
+                          AuthenticationManager authenticationManager, JwtUtil jwtUtil,
+                          ITwoFactorAuthenticationService twoFactorAuthenticationService, IRecaptchaService recaptchaService) {
         this.userService = userService;
         this.userRegistrationService = userRegistrationService;
         this.userActivationService = userActivationService;
@@ -51,6 +52,7 @@ public class UserController {
         this.authenticationManager = authenticationManager;
         this.twoFactorAuthenticationService = twoFactorAuthenticationService;
         this.jwtUtil = jwtUtil;
+        this.recaptchaService = recaptchaService;
     }
 
 
@@ -61,10 +63,32 @@ public class UserController {
         return new ResponseEntity<>(userMeDTO, HttpStatus.OK);
     }
 
+    // FOR TESTING PURPOSES ONLY 
+    @PostMapping(value = "/login2", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> loginUser(@Valid @RequestBody UserCredentialsDTO userCredentialDTO) {
+        try{
+        recaptchaService.isResponseValid(userCredentialDTO.getRecaptchaToken());
+        var authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userCredentialDTO.getEmail(),
+                        userCredentialDTO.getPassword())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        userService.isUserVerified(userCredentialDTO.getEmail());
+
+        String token = jwtUtil.generateToken(authentication);
+        AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
+        return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
+        } catch(NotValidRecaptchaException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
+        }
+    }
+
 
     @PostMapping(value = "/verify", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> sendAuthCode(@Valid @RequestBody UserCredentialsDTO userCredentialDTO,  @RequestParam String confirmationMethod, HttpSession session) {
         try {
+            recaptchaService.isResponseValid(userCredentialDTO.getRecaptchaToken());
+
             var authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userCredentialDTO.getEmail(), userCredentialDTO.getPassword())
             );
@@ -73,9 +97,7 @@ public class UserController {
             userService.isUserVerified(userCredentialDTO.getEmail());
             userService.checkPasswordExpiration(userCredentialDTO.getEmail());
 
-
             twoFactorAuthenticationService.sendCode(userCredentialDTO.getEmail(), confirmationMethod);
-
             session.setAttribute("authentication", authentication);
 
             return ResponseEntity.ok().body(new ResponseMessageDTO("Verification code sent. Please enter the code to complete the login."));
@@ -85,6 +107,8 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO("Wrong username or password!"));
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }catch(NotValidRecaptchaException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
         }
     }
 
@@ -93,7 +117,9 @@ public class UserController {
         try {
             twoFactorAuthenticationService.verifyCode(email, code);
             var authentication = (Authentication) session.getAttribute("authentication");
+            session.invalidate();
             System.out.println(authentication);
+            System.out.println(authentication.getPrincipal());
             String token = jwtUtil.generateToken(authentication);
             AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
             return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
