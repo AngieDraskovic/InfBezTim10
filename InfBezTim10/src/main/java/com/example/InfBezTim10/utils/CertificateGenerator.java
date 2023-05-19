@@ -35,8 +35,15 @@ public class CertificateGenerator {
     }
 
     private X509v3CertificateBuilder createCertificateBuilder(CertificateConfig config) {
-        X500Name issuer = config.getIssuer() != null ? new X500Name("CN=" + config.getIssuer().getUserEmail()) : config.getSubject();
-        X500Name subject = config.getSubject();
+        X500Name issuer, subject;
+        if (config.getIssuer() == null) {
+            issuer = new X500Name("CN=localhost");
+            subject = new X500Name("CN=localhost");
+        } else {
+            issuer = new X500Name("CN=" + config.getIssuer().getUserEmail());
+            subject = config.getSubject();
+        }
+
         Date validFrom = config.getValidFrom();
         Date validTo = config.getValidTo();
         KeyPair keyPair = config.getKeyPair();

@@ -7,12 +7,13 @@ import com.example.InfBezTim10.repository.ICertificateRepository;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateService;
 import com.example.InfBezTim10.service.base.implementation.MongoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -34,25 +35,17 @@ public class CertificateService extends MongoService<Certificate> implements ICe
 
     @Override
     public List<Certificate> findCertificatesSignedBy(String issuerSN) {
-        return certificateRepository.findCertificatesSignedBy(issuerSN);
+        return certificateRepository.findSignedBy(issuerSN);
     }
 
     @Override
-    public List<Certificate> findCertificatesForUser(String email) {
-        return certificateRepository.findCertificatesForUser(email);
+    public Page<Certificate> findCertificatesForUser(String userEmail, Pageable pageable) {
+        return certificateRepository.findByUserEmail(userEmail, pageable);
     }
 
     @Override
-    public List<Certificate> findCertificatesIssuedByUser(String userEmail) {
-        List<Certificate> userCertificates = findCertificatesForUser(userEmail);
-        List<Certificate> signedCertificates = new ArrayList<>();
-
-        for (Certificate userCertificate : userCertificates) {
-            List<Certificate> certificatesSignedByIssuer = findCertificatesSignedBy(userCertificate.getSerialNumber());
-            signedCertificates.addAll(certificatesSignedByIssuer);
-        }
-
-        return signedCertificates;
+    public List<Certificate> findCertificatesForUser(String userEmail) {
+        return certificateRepository.findByUserEmail(userEmail);
     }
 
     @Override
@@ -67,11 +60,27 @@ public class CertificateService extends MongoService<Certificate> implements ICe
         }
     }
 
+    @Override
+    public long countAllCertificates() {
+        return certificateRepository.count();
+    }
+
+    @Override
+    public Long countCertificatesByStatus(CertificateStatus status) {
+        Long count = certificateRepository.countByStatus(status);
+        if (count == null) {
+            count = 0L;
+        }
+
+        return count;
+    }
+
     @Scheduled(cron = "0 0 0,12 * * ?")
-    public void validatePendingCertificates() {
-        List<Certificate> certificatesToBeValidated = certificateRepository.findCertificatesToBeValidated(new Date());
+    public void validateExpiredCertificates() {
+        List<Certificate> certificatesToBeValidated = certificateRepository.findExpired(new Date());
         for (Certificate certificate : certificatesToBeValidated) {
-            certificate.setStatus(CertificateStatus.VALID);
+//            TODO ADD EXPIRATION LOGIC
+            certificate.setStatus(CertificateStatus.EXPIRED);
             certificateRepository.save(certificate);
         }
     }
