@@ -27,4 +27,8 @@ public class UserRegistrationDTO {
 
     @Length(min = 6,  message = "Field password is not valid. Minimum length are 6 characters!")
     private String password;
+
+    private String recaptchaToken;
+
+
 }
