@@ -67,7 +67,7 @@ public class UserController {
     @PostMapping(value = "/login2", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserCredentialsDTO userCredentialDTO) {
         try{
-        //recaptchaService.isResponseValid(userCredentialDTO.getRecaptchaToken());
+        recaptchaService.isResponseValid(userCredentialDTO.getRecaptchaToken());
         var authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userCredentialDTO.getEmail(),
                         userCredentialDTO.getPassword())

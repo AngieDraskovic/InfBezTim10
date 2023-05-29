@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class JwtUtil {
     // TODO: duzina sesije, modifikovati za testiranje
     private Integer tokenValidity = 60*10;
-
     private String SECRET_KEY = "secret";
     private String authoritiesKey = "role";
     private final IUserService userService;
