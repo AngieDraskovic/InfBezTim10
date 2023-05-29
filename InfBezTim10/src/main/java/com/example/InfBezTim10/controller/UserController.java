@@ -1,8 +1,11 @@
 package com.example.InfBezTim10.controller;
 
 import com.example.InfBezTim10.dto.*;
+import com.example.InfBezTim10.dto.auth.*;
 import com.example.InfBezTim10.dto.user.*;
 import com.example.InfBezTim10.exception.*;
+import com.example.InfBezTim10.exception.auth.PasswordExpiredException;
+import com.example.InfBezTim10.exception.auth.TwoFactorCodeNotFoundException;
 import com.example.InfBezTim10.exception.user.*;
 import com.example.InfBezTim10.mapper.UserMapper;
 import com.example.InfBezTim10.model.user.User;
@@ -25,12 +28,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Collections;
+import java.util.UUID;
 
 
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
     private final IUserService userService;
+    private final ITemporaryTokenService temporaryTokenService;
     private final IUserRegistrationService userRegistrationService;
     private final IUserActivationService userActivationService;
     private final IPasswordResetService passwordResetService;
@@ -41,10 +47,11 @@ public class UserController {
     private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserController(IUserService userService, IUserRegistrationService userRegistrationService,
+    public UserController(IUserService userService, ITemporaryTokenService temporaryTokenService, IUserRegistrationService userRegistrationService,
                           IUserActivationService userActivationService, IPasswordResetService passwordResetService,
                           AuthenticationManager authenticationManager, JwtUtil jwtUtil, ITwoFactorAuthenticationService twoFactorAuthenticationService) {
         this.userService = userService;
+        this.temporaryTokenService = temporaryTokenService;
         this.userRegistrationService = userRegistrationService;
         this.userActivationService = userActivationService;
         this.passwordResetService = passwordResetService;
@@ -61,6 +68,51 @@ public class UserController {
         return new ResponseEntity<>(userMeDTO, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody UserCredentialsDTO userCredentialsDTO) {
+        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                userCredentialsDTO.getEmail(),
+                userCredentialsDTO.getPassword())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        userService.isUserVerified(userCredentialsDTO.getEmail());
+        userService.checkPasswordExpiration(userCredentialsDTO.getEmail());
+
+        String temporaryToken = UUID.randomUUID().toString();
+        temporaryTokenService.storeTemporaryToken(userCredentialsDTO.getEmail(), temporaryToken);
+
+        return ResponseEntity.ok(new LoginResponseDTO("Valid credentials", temporaryToken));
+    }
+
+    @PostMapping(value = "/2fa/method", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> select2FAMethod(@RequestBody TwoFAMethodRequestDTO twoFAMethodRequestDTO) {
+        userService.findByEmail(twoFAMethodRequestDTO.getEmail());
+        if (!twoFAMethodRequestDTO.getMethod().equalsIgnoreCase("email") && !twoFAMethodRequestDTO.getMethod().equalsIgnoreCase("sms")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid method type");
+        }
+
+        twoFactorAuthenticationService.sendCode(twoFAMethodRequestDTO.getEmail(), twoFAMethodRequestDTO.getMethod());
+        return ResponseEntity.ok("2FA code sent");
+    }
+
+    @PostMapping(value = "/2fa/verify", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> verify2FA(@RequestBody VerificationRequestDTO verificationRequestDTO) {
+        User user = userService.findByEmail(verificationRequestDTO.getEmail());
+        if (!temporaryTokenService.isValidTemporaryToken(verificationRequestDTO.getEmail(), verificationRequestDTO.getTemporaryToken())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired temporary token");
+        }
+
+        twoFactorAuthenticationService.verifyCode(verificationRequestDTO.getEmail(), verificationRequestDTO.getCode());
+        temporaryTokenService.removeTemporaryToken(verificationRequestDTO.getEmail());
+
+        org.springframework.security.core.userdetails.User userDetails = new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
+                Collections.singletonList(user.getAuthority()));
+        Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, Collections.singletonList(user.getAuthority()));
+        String jwt = jwtUtil.generateToken(auth);
+        AuthTokenDTO tokenDTO = new AuthTokenDTO(jwt, jwt);
+        return ResponseEntity.ok(tokenDTO);
+    }
 
     @PostMapping(value = "/verify", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> sendAuthCode(@Valid @RequestBody UserCredentialsDTO userCredentialDTO, @RequestParam String confirmationMethod, HttpSession session) {
@@ -73,7 +125,6 @@ public class UserController {
             userService.isUserVerified(userCredentialDTO.getEmail());
             userService.checkPasswordExpiration(userCredentialDTO.getEmail());
 
-
             twoFactorAuthenticationService.sendCode(userCredentialDTO.getEmail(), confirmationMethod);
 
             session.setAttribute("authentication", authentication);
@@ -83,8 +134,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO("Wrong username or password!"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -93,7 +142,6 @@ public class UserController {
         try {
             twoFactorAuthenticationService.verifyCode(email, code);
             var authentication = (Authentication) session.getAttribute("authentication");
-            System.out.println(authentication);
             String token = jwtUtil.generateToken(authentication);
             AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
             return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
@@ -104,19 +152,10 @@ public class UserController {
         }
     }
 
-//    Testiranje
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> login(@Valid @RequestBody UserCredentialsDTO userCredentialDTO) {
-        var authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userCredentialDTO.getEmail(),
-                        userCredentialDTO.getPassword())
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        userService.isUserVerified(userCredentialDTO.getEmail());
-
-        String token = jwtUtil.generateToken(authentication);
-        AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
-        return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
+    @GetMapping("/exists")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean exists = userService.emailExists(email);
+        return ResponseEntity.ok(exists);
     }
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -129,7 +168,6 @@ public class UserController {
             throw new RuntimeException(e);
         }
     }
-
 
     @GetMapping(value = "/activate/{activationId}")
     public ResponseEntity<?> activateUser(@PathVariable("activationId") String activationId) {

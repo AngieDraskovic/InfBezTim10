@@ -1,4 +1,4 @@
-package com.example.InfBezTim10.dto;
+package com.example.InfBezTim10.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AuthTokenDTO {
-    String accessToken;
-    String refreshToken;
+public class TwoFAMethodRequestDTO {
+    String email;
+    String method;
 }

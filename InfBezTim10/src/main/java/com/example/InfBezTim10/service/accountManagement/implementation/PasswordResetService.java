@@ -6,7 +6,7 @@ import com.example.InfBezTim10.exception.user.IncorrectCodeException;
 import com.example.InfBezTim10.exception.user.PasswordDoNotMatchException;
 import com.example.InfBezTim10.exception.user.PasswordResetNotFoundException;
 import com.example.InfBezTim10.exception.user.PreviousPasswordException;
-import com.example.InfBezTim10.model.user.PasswordReset;
+import com.example.InfBezTim10.model.auth.PasswordReset;
 import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.repository.IPasswordResetRepository;
 import com.example.InfBezTim10.service.accountManagement.IPasswordResetService;
@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.time.LocalDateTime;
-import java.util.stream.Collectors;
 
 @Service
 public class PasswordResetService extends MongoService<PasswordReset> implements IPasswordResetService {

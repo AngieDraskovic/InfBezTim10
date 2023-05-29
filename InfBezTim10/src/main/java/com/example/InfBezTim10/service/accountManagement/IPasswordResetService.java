@@ -3,7 +3,7 @@ package com.example.InfBezTim10.service.accountManagement;
 import com.example.InfBezTim10.dto.user.RenewPasswordDTO;
 import com.example.InfBezTim10.dto.user.ResetPasswordDTO;
 import com.example.InfBezTim10.exception.user.PasswordDoNotMatchException;
-import com.example.InfBezTim10.model.user.PasswordReset;
+import com.example.InfBezTim10.model.auth.PasswordReset;
 import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.service.base.IJPAService;
 

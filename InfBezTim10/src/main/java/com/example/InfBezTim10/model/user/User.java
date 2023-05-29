@@ -30,10 +30,12 @@ public class User extends BaseEntity {
 
     private AccountStatus accountStatus;
 
-    private List<String> previousPasswords;
-
     @DBRef
     private Authority authority;
+
+    private String oauthId;
+
+    private List<String> previousPasswords;
 
     private LocalDateTime lastPasswordResetDate;
 
@@ -43,15 +45,29 @@ public class User extends BaseEntity {
         this.setAccountStatus(AccountStatus.PENDING_VERIFICATION);
     }
 
-    public User(String name, String surname, String email, String password, String telephoneNumber) {
-        super();
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
-        this.password = password;
-        this.telephoneNumber = telephoneNumber;
-        this.setAccountStatus(AccountStatus.PENDING_VERIFICATION);
-        this.setLastPasswordResetDate(LocalDateTime.now());
-        this.setPreviousPasswords(new ArrayList<>());
+    public static User createNormalUser(String email, String password, String name, String surname, String telephoneNumber) {
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setName(name);
+        user.setSurname(surname);
+        user.setTelephoneNumber(telephoneNumber);
+        user.setAccountStatus(AccountStatus.PENDING_VERIFICATION);
+        user.setLastPasswordResetDate(LocalDateTime.now());
+        user.setPreviousPasswords(new ArrayList<>());
+        return user;
+    }
+
+    public static User createOAuthUser(String email, String password, String name, String surname, String oauthId) {
+        User user = new User();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setName(name);
+        user.setSurname(surname);
+        user.setOauthId(oauthId);
+        user.setAccountStatus(AccountStatus.AUTHENTICATED_THROUGH_OAUTH);
+        user.setLastPasswordResetDate(LocalDateTime.now());
+        user.setPreviousPasswords(new ArrayList<>());
+        return user;
     }
 }

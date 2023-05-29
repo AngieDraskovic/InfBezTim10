@@ -4,7 +4,7 @@ import com.example.InfBezTim10.exception.NotFoundException;
 import com.example.InfBezTim10.exception.user.UserActivationNotFoundException;
 import com.example.InfBezTim10.model.user.AccountStatus;
 import com.example.InfBezTim10.model.user.User;
-import com.example.InfBezTim10.model.user.UserActivation;
+import com.example.InfBezTim10.model.auth.UserActivation;
 import com.example.InfBezTim10.repository.IUserActivationRepository;
 import com.example.InfBezTim10.service.accountManagement.IUserActivationService;
 import com.example.InfBezTim10.service.userManagement.IUserService;

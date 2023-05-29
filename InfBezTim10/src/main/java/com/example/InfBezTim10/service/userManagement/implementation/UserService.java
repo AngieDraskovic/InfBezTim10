@@ -1,9 +1,10 @@
 package com.example.InfBezTim10.service.userManagement.implementation;
 
-import com.example.InfBezTim10.exception.user.PasswordExpiredException;
-import com.example.InfBezTim10.exception.user.UserNotVerifiedException;
+import com.example.InfBezTim10.exception.auth.PasswordExpiredException;
+import com.example.InfBezTim10.exception.auth.UserNotVerifiedException;
 import com.example.InfBezTim10.exception.user.UserNotFoundException;
 import com.example.InfBezTim10.model.user.AccountStatus;
+import com.example.InfBezTim10.model.user.Authority;
 import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.repository.IUserRepository;
 import com.example.InfBezTim10.service.base.implementation.MongoService;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Optional;
 
 @Service
 public class UserService extends MongoService<User> implements IUserService, UserDetailsService {
@@ -31,18 +31,18 @@ public class UserService extends MongoService<User> implements IUserService, Use
     }
 
     @Override
-    public User findByEmail(String email) throws UserNotFoundException {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-        if (optionalUser.isPresent()) {
-            return optionalUser.get();
-        } else {
-            throw new UserNotFoundException("User with email " + email + " not found.");
-        }
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found."));
     }
 
     @Override
     public boolean emailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
+    }
+
+    @Override
+    public User findByOauthId(String oauthId) {
+        return userRepository.findByOauthId(oauthId).orElseThrow(() -> new UserNotFoundException("User with oauth id " + oauthId + " not found."));
     }
 
     public void isUserVerified(String email) {
@@ -55,10 +55,16 @@ public class UserService extends MongoService<User> implements IUserService, Use
     @Override
     public void checkPasswordExpiration(String email) {
         User user = findByEmail(email);
+
+        // TODO izmeni
+        if (true) {
+            return;
+        }
+
         LocalDateTime lastResetDate = user.getLastPasswordResetDate();
         LocalDateTime expirationDate = lastResetDate.plusDays(30);
-       // LocalDateTime expirationDate = lastResetDate.plusMinutes(2);    // TODO: ova vrijednost samo za provjere
-        if (expirationDate.isBefore(LocalDateTime.now())){
+        // LocalDateTime expirationDate = lastResetDate.plusMinutes(2);    // TODO: ova vrijednost samo za provjere
+        if (expirationDate.isBefore(LocalDateTime.now())) {
             throw new PasswordExpiredException("Your password has expired. Please enter a new one. ");
         }
     }
@@ -75,6 +81,4 @@ public class UserService extends MongoService<User> implements IUserService, Use
     protected MongoRepository<User, String> getEntityRepository() {
         return this.userRepository;
     }
-
-
 }

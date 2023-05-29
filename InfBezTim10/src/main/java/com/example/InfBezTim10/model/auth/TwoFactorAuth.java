@@ -1,6 +1,7 @@
-package com.example.InfBezTim10.model.user;
+package com.example.InfBezTim10.model.auth;
 
 import com.example.InfBezTim10.model.BaseEntity;
+import com.example.InfBezTim10.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,23 +13,20 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Document(collection = "activations")
+@Document(collection = "two-factors")
 @Getter
 @AllArgsConstructor
 @Setter
 @RequiredArgsConstructor
-public class UserActivation extends BaseEntity {
+public class TwoFactorAuth extends BaseEntity {
 
     @Indexed(unique=true)
-    private String activationId;
+    private String code;
     @DBRef
     private User user;
     private LocalDateTime creationDate;
-
     @Override
     public int hashCode() {
-        return Objects.hash(getActivationId(), getUser(), getCreationDate());
+        return Objects.hash(getCode(), getUser(), getCreationDate());
     }
-
-
 }

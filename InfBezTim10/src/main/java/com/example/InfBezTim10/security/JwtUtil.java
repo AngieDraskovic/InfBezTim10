@@ -63,7 +63,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
-                .setId(userService.findByEmail(authentication.getName()).getId().toString())
+                .setId(userService.findByEmail(authentication.getName()).getId())
                 .claim(authoritiesKey, authorities)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + tokenValidity * 1000))

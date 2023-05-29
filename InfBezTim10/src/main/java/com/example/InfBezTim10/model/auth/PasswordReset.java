@@ -1,6 +1,7 @@
-package com.example.InfBezTim10.model.user;
+package com.example.InfBezTim10.model.auth;
 
 import com.example.InfBezTim10.model.BaseEntity;
+import com.example.InfBezTim10.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,13 +13,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Document(collection = "two-factors")
+@Document(collection = "resets")
 @Getter
 @AllArgsConstructor
 @Setter
 @RequiredArgsConstructor
-public class TwoFactorAuth extends BaseEntity {
-
+public class PasswordReset extends BaseEntity {
     @Indexed(unique=true)
     private String code;
     @DBRef

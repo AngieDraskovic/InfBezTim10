@@ -1,4 +1,4 @@
-package com.example.InfBezTim10.exception.user;
+package com.example.InfBezTim10.exception.auth;
 
 import com.example.InfBezTim10.exception.NotFoundException;
 

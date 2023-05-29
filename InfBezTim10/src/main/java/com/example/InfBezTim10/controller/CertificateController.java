@@ -2,11 +2,7 @@ package com.example.InfBezTim10.controller;
 
 import com.example.InfBezTim10.dto.PaginatedResponse;
 import com.example.InfBezTim10.dto.certificate.CertificateDTO;
-import com.example.InfBezTim10.dto.certificateRequst.CreateCertificateRequestDTO;
-import com.example.InfBezTim10.dto.user.UserDetailsDTO;
-import com.example.InfBezTim10.exception.certificate.CertificateNotFoundException;
 import com.example.InfBezTim10.mapper.CertificateMapper;
-import com.example.InfBezTim10.mapper.CertificateRequestMapper;
 import com.example.InfBezTim10.model.certificate.Certificate;
 import com.example.InfBezTim10.model.certificate.CertificateStatus;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateGeneratorService;
@@ -15,9 +11,7 @@ import com.example.InfBezTim10.service.certificateManagement.ICertificateValidat
 import com.example.InfBezTim10.utils.CertificateFileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,14 +20,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;

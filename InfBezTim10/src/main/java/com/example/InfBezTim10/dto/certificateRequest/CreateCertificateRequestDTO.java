@@ -1,4 +1,4 @@
-package com.example.InfBezTim10.dto.certificateRequst;
+package com.example.InfBezTim10.dto.certificateRequest;
 
 import com.example.InfBezTim10.model.certificate.CertificateType;
 import com.fasterxml.jackson.annotation.JsonFormat;

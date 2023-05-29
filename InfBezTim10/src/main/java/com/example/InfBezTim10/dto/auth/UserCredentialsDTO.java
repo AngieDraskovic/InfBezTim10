@@ -1,4 +1,4 @@
-package com.example.InfBezTim10.dto.user;
+package com.example.InfBezTim10.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

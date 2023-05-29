@@ -6,6 +6,5 @@ public interface ITwillioService {
 
     void sendConfirmNumberSMS(User user, String activationId);
     void sendResetPasswordSMS(User user, String code);
-
     void sendTwoFactorAuthCodeSMS(User user, String code);
 }

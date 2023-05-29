@@ -1,8 +1,8 @@
 package com.example.InfBezTim10.controller;
 
 import com.example.InfBezTim10.dto.PaginatedResponse;
-import com.example.InfBezTim10.dto.certificateRequst.CertificateRequestDTO;
-import com.example.InfBezTim10.dto.certificateRequst.CreateCertificateRequestDTO;
+import com.example.InfBezTim10.dto.certificateRequest.CertificateRequestDTO;
+import com.example.InfBezTim10.dto.certificateRequest.CreateCertificateRequestDTO;
 import com.example.InfBezTim10.dto.RejectionReasonDTO;
 import com.example.InfBezTim10.exception.certificate.CertificateGenerationException;
 import com.example.InfBezTim10.mapper.CertificateRequestMapper;

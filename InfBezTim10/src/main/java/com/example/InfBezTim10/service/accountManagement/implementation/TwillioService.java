@@ -38,6 +38,5 @@ public class TwillioService implements ITwillioService {
         PhoneNumber to = new PhoneNumber(user.getTelephoneNumber());
         Message message = Message.creator(to, from, body).create();
         System.out.println(message.getSid());
-
     }
 }

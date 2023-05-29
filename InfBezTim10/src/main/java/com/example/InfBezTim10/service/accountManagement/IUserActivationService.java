@@ -2,7 +2,7 @@ package com.example.InfBezTim10.service.accountManagement;
 
 import com.example.InfBezTim10.exception.NotFoundException;
 import com.example.InfBezTim10.model.user.User;
-import com.example.InfBezTim10.model.user.UserActivation;
+import com.example.InfBezTim10.model.auth.UserActivation;
 import com.example.InfBezTim10.service.base.IJPAService;
 
 public interface IUserActivationService extends IJPAService<UserActivation> {
