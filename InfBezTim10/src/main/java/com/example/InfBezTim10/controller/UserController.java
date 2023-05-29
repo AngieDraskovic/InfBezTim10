@@ -80,6 +80,8 @@ public class UserController {
         return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
         } catch(NotValidRecaptchaException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
+        }catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO("Wrong username or password!"));
         }
     }
 
@@ -130,37 +132,25 @@ public class UserController {
         }
     }
 
-//    Testiranje
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> login(@Valid @RequestBody UserCredentialsDTO userCredentialDTO) {
-        var authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userCredentialDTO.getEmail(),
-                        userCredentialDTO.getPassword())
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        userService.isUserVerified(userCredentialDTO.getEmail());
-
-        String token = jwtUtil.generateToken(authentication);
-        AuthTokenDTO tokenDTO = new AuthTokenDTO(token, token);
-        return new ResponseEntity<>(tokenDTO, HttpStatus.OK);
-    }
-
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO, @RequestParam String confirmationMethod
-    ) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDTO userRegistrationDTO, @RequestParam String confirmationMethod) {
         try {
+            recaptchaService.isResponseValid(userRegistrationDTO.getRecaptchaToken());
             User user = userRegistrationService.registerUser(UserMapper.INSTANCE.userRegistrationDTOtoUser(userRegistrationDTO), confirmationMethod);
             return ResponseEntity.status(HttpStatus.OK).body(UserMapper.INSTANCE.userToUserDetailsDTO(user));
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }catch(NotValidRecaptchaException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
         }
     }
 
 
-    @GetMapping(value = "/activate/{activationId}")
-    public ResponseEntity<?> activateUser(@PathVariable("activationId") String activationId) {
+    @PostMapping(value = "/activate")
+    public ResponseEntity<?> activateUser(@RequestBody ActivationDTO activationDTO) {
         try {
-            userActivationService.activate(activationId);
+            recaptchaService.isResponseValid(activationDTO.getRecaptchaToken());
+            userActivationService.activate(activationDTO.getActivationId());
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMessageDTO(e.getMessage()));
         }
@@ -185,7 +175,7 @@ public class UserController {
         try {
             passwordResetService.resetPassword(email, passwordDTO);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (UserNotFoundException e) {
+        } catch (UserNotFoundException | PasswordResetNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMessageDTO(e.getMessage()));
         } catch (PasswordDoNotMatchException | PreviousPasswordException | IncorrectCodeException e) {
             throw new RuntimeException(e);
