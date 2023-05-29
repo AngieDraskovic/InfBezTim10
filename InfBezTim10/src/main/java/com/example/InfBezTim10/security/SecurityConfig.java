@@ -18,6 +18,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.http.HttpMethod.*;
 
@@ -39,6 +45,7 @@ public class SecurityConfig {
         this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
     }
 
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
@@ -51,6 +58,8 @@ public class SecurityConfig {
                 .requestMatchers(GET, "/api/user/me").permitAll()
                 .requestMatchers(GET, "/api/user/activate/**").permitAll()
                 .requestMatchers(GET, "/api/user/exists").permitAll()
+                .requestMatchers(POST, "/api/user/login2/**").permitAll()
+                .requestMatchers(POST, "/api/user/activate").permitAll()
                 .requestMatchers(GET, "/api/user/resetPassword/**").permitAll()
                 .requestMatchers(PUT, "/api/user/resetPassword/**").permitAll()
                 .requestMatchers(PUT, "/api/user/renewPassword/**").permitAll()
@@ -69,6 +78,7 @@ public class SecurityConfig {
         http.headers().frameOptions().sameOrigin();
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -95,4 +105,6 @@ public class SecurityConfig {
             web.ignoring().requestMatchers(HttpMethod.POST, "/api/user/registration");
         };
     }
+
+
 }

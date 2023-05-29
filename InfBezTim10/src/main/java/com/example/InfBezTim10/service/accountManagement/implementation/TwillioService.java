@@ -16,7 +16,6 @@ public class TwillioService implements ITwillioService {
         PhoneNumber from = new PhoneNumber("+16206369991");
         PhoneNumber to = new PhoneNumber(user.getTelephoneNumber());
         Message message = Message.creator(to, from, body).create();
-        System.out.println(message.getSid());
     }
 
     @Override
@@ -26,7 +25,6 @@ public class TwillioService implements ITwillioService {
         PhoneNumber from = new PhoneNumber("+16206369991");
         PhoneNumber to = new PhoneNumber(user.getTelephoneNumber());
         Message message = Message.creator(to, from, body).create();
-        System.out.println(message.getSid());
     }
 
 
@@ -37,6 +35,5 @@ public class TwillioService implements ITwillioService {
         PhoneNumber from = new PhoneNumber("+16206369991");
         PhoneNumber to = new PhoneNumber(user.getTelephoneNumber());
         Message message = Message.creator(to, from, body).create();
-        System.out.println(message.getSid());
     }
 }
