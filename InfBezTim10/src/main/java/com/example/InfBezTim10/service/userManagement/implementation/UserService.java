@@ -53,20 +53,16 @@ public class UserService extends MongoService<User> implements IUserService, Use
     }
 
     @Override
-    public void checkPasswordExpiration(String email) {
+    public boolean isPasswordExpired(String email) {
         User user = findByEmail(email);
-
-        // TODO izmeni
-        if (true) {
-            return;
+        if (user.getLastPasswordResetDate() == null) {
+            return true;
         }
 
         LocalDateTime lastResetDate = user.getLastPasswordResetDate();
         LocalDateTime expirationDate = lastResetDate.plusDays(30);
         //LocalDateTime expirationDate = lastResetDate.plusMinutes(2);    // TODO: ova vrijednost samo za provjere
-        if (expirationDate.isBefore(LocalDateTime.now())){
-            throw new PasswordExpiredException("Your password has expired. Please enter a new one. ");
-        }
+        return expirationDate.isBefore(LocalDateTime.now());
     }
 
     @Override

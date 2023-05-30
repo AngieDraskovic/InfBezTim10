@@ -11,9 +11,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ActivationDTO {
-
-
     private String activationId;
-
-    private String recaptchaToken;
 }

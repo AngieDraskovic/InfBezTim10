@@ -13,5 +13,5 @@ public interface IUserService extends IJPAService<User> {
 
     void isUserVerified(String email);
 
-    void checkPasswordExpiration(String email);
+    boolean isPasswordExpired(String email);
 }

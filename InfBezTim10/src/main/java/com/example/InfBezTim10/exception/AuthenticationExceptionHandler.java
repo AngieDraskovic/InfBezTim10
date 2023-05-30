@@ -6,6 +6,7 @@ import com.example.InfBezTim10.exception.auth.PasswordExpiredException;
 import com.example.InfBezTim10.exception.auth.TwoFactorCodeSendingException;
 import com.example.InfBezTim10.exception.auth.UserNotVerifiedException;
 import com.example.InfBezTim10.exception.user.IncorrectCodeException;
+import com.example.InfBezTim10.exception.user.PreviousPasswordException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -43,6 +44,16 @@ public class AuthenticationExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handlePasswordExpiredException(Exception exception) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.FORBIDDEN.value(),
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler({PreviousPasswordException.class})
+    public ResponseEntity<ErrorResponseDTO> handlePreviousPasswordException(Exception exception) {
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.BAD_REQUEST.value(),
                 exception.getMessage(),
                 System.currentTimeMillis()
         );

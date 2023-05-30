@@ -11,5 +11,6 @@ import lombok.Setter;
 @Setter
 public class LoginResponseDTO {
     String message;
+    Boolean passwordExpired;
     String temporaryToken;
 }

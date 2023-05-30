@@ -12,10 +12,9 @@ import org.hibernate.validator.constraints.Length;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RenewPasswordDTO {
-
     @Length(min = 6)
     private String newPassword;
     @Length(min = 6)
     private String newPasswordConfirm;
-
+    private String temporaryToken;
 }
