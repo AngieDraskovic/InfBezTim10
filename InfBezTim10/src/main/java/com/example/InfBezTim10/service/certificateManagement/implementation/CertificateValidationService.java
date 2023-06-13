@@ -23,7 +23,7 @@ import java.util.Date;
 @Service
 public class CertificateValidationService implements ICertificateValidationService {
 
-    private static final String rootSN = "3d60168647599f8e";
+    private static final String rootSN = "e0333e50889ea3a0";
 
     private final CertificateFileUtils certificateFileUtils;
     private final CertificateService certificateService;
@@ -43,8 +43,6 @@ public class CertificateValidationService implements ICertificateValidationServi
             throw new CertificateValidationException("Certificate copy is not valid!", e);
         }
     }
-
-
 
     private void validateCertificateChain(Certificate currCert, X509Certificate currX509Cert) throws CertificateValidationException, CertificateException, IOException {
         if (currCert == null) {

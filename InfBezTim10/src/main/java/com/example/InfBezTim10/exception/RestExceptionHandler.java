@@ -27,17 +27,17 @@ public class RestExceptionHandler {
                 exception.getMessage(),
                 System.currentTimeMillis()
         );
-        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({CertificateValidationException.class})
-    public ResponseEntity<ErrorResponseDTO> handleCertificationValidationException(CertificateNotFoundException exception) {
+    public ResponseEntity<ErrorResponseDTO> handleCertificationValidationException(Exception exception) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.BAD_REQUEST.value(),
                 exception.getMessage(),
                 System.currentTimeMillis()
         );
-        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({CertificateRequestValidationException.class})
@@ -47,7 +47,7 @@ public class RestExceptionHandler {
                 exception.getMessage(),
                 System.currentTimeMillis()
         );
-        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler({CertificateReadException.class, PrivateKeyReadException.class})
@@ -57,6 +57,6 @@ public class RestExceptionHandler {
                 exception.getMessage(),
                 System.currentTimeMillis()
         );
-        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
