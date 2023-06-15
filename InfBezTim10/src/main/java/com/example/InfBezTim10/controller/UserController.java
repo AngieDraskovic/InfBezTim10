@@ -79,7 +79,7 @@ public class UserController {
         String temporaryToken = UUID.randomUUID().toString();
         temporaryTokenService.storeTemporaryToken(userCredentialsDTO.getEmail(), temporaryToken);
         if (userService.isPasswordExpired(userCredentialsDTO.getEmail())) {
-            return ResponseEntity.ok(new LoginResponseDTO("Valid credentials", true, temporaryToken));
+            return ResponseEntity.ok(new LoginResponseDTO("Password expired", true, temporaryToken));
         }
 
         return ResponseEntity.ok(new LoginResponseDTO("Valid credentials", false, temporaryToken));

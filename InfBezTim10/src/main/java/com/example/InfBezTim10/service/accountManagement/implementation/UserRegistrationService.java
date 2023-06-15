@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Service
 public class UserRegistrationService implements IUserRegistrationService {
@@ -42,6 +43,7 @@ public class UserRegistrationService implements IUserRegistrationService {
             throw new EmailAlreadyExistsException("Email already exists.");
         } else {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setLastPasswordResetDate(LocalDateTime.now());
             user.setAuthority(authorityService.getAuthority(AuthorityEnum.USER));
             user = userService.save(user);
             UserActivation activation = userActivationService.create(user);

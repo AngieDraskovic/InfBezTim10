@@ -76,9 +76,11 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
     public void resetPassword(String userEmail, ResetPasswordDTO resetPasswordDTO) throws PasswordDoNotMatchException {
         User user = userService.findByEmail(userEmail);
         PasswordReset passwordReset = findByCode(resetPasswordDTO.getCode());
-        if(!passwordReset.getUser().getEmail().equals(userEmail)){
+
+        if (!passwordReset.getUser().getEmail().equals(userEmail)){
             throw new IncorrectCodeException("Incorrect code!");
         }
+
         if (!resetPasswordDTO.getNewPassword().equals(resetPasswordDTO.getNewPasswordConfirm())) {
             throw new PasswordDoNotMatchException("Passwords do not match!");
         }
@@ -88,6 +90,7 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
         if (previousNPasswords.stream().anyMatch(oldPassword -> passwordEncoder.matches(newPassword, oldPassword))) {
             throw new PreviousPasswordException("You cannot use one of your previous passwords!");
         }
+
         user.setPreviousPasswords(rotation(user));
         user.setPassword(passwordEncoder.encode(resetPasswordDTO.getNewPassword()));
         user.setLastPasswordResetDate(LocalDateTime.now());
