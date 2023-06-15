@@ -24,6 +24,7 @@ import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -119,6 +120,17 @@ public class CertificateController {
     public ResponseEntity<?> validateCopy(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return new ResponseEntity<>("File is empty", HttpStatus.BAD_REQUEST);
+        }
+
+        long MAX_FILE_SIZE = 5 * 1024 * 1024;
+        if (file.getSize() > MAX_FILE_SIZE) {
+            return new ResponseEntity<>("File is too large. Maximum size is 5MB.", HttpStatus.BAD_REQUEST);
+        }
+
+        String[] acceptableFileTypes = {"application/x-x509-ca-cert", "application/x-pem-file", "application/pkix-cert"};
+        String fileType = file.getContentType();
+        if (!Arrays.asList(acceptableFileTypes).contains(fileType)) {
+            return new ResponseEntity<>("Invalid file type. Only .crt, .pem, .cer, or .key files are allowed.", HttpStatus.BAD_REQUEST);
         }
 
         certificateValidationService.validate(file);
