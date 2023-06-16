@@ -159,6 +159,7 @@ public class UserController {
     @PutMapping(value = "/resetPassword/{email}")
     public ResponseEntity<?> resetPassword(@Valid @PathVariable("email") String email, @RequestBody ResetPasswordDTO passwordDTO) {
         try {
+            this.recaptchaService.isResponseValid(passwordDTO.getRecaptchaToken());
             passwordResetService.resetPassword(email, passwordDTO);
             return ResponseEntity.ok().build();
         } catch (UserNotFoundException | PasswordResetNotFoundException e) {
