@@ -9,6 +9,8 @@ import com.example.InfBezTim10.repository.IUserActivationRepository;
 import com.example.InfBezTim10.service.accountManagement.IUserActivationService;
 import com.example.InfBezTim10.service.userManagement.IUserService;
 import com.example.InfBezTim10.service.base.implementation.MongoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ public class UserActivationService extends MongoService<UserActivation> implemen
     private final IUserActivationRepository userActivationRepository;
     private final IUserService userService;
     private final Random rand = new Random();
-
+    private static final Logger logger = LoggerFactory.getLogger(UserRegistrationService.class);
     @Autowired
     public UserActivationService(IUserActivationRepository userActivationRepository, IUserService userService) {
         this.userActivationRepository = userActivationRepository;
@@ -62,7 +64,10 @@ public class UserActivationService extends MongoService<UserActivation> implemen
     @Override
     public UserActivation findByActivationId(String activationId) {
         return userActivationRepository.findByActivationId(activationId)
-                .orElseThrow(() -> new UserActivationNotFoundException("Activation with id " + activationId + " not found!"));
+                .orElseThrow(() -> {
+                    logger.error("User Activation with ID: {} not found!", activationId);
+                    return new UserActivationNotFoundException("Activation with id " + activationId + " not found!");
+                });
     }
 
     @Override

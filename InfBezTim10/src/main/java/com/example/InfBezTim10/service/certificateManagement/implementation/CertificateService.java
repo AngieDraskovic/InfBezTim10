@@ -1,11 +1,14 @@
 package com.example.InfBezTim10.service.certificateManagement.implementation;
 
+import com.example.InfBezTim10.controller.UserController;
 import com.example.InfBezTim10.exception.certificate.CertificateNotFoundException;
 import com.example.InfBezTim10.model.certificate.Certificate;
 import com.example.InfBezTim10.model.certificate.CertificateStatus;
 import com.example.InfBezTim10.repository.ICertificateRepository;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateService;
 import com.example.InfBezTim10.service.base.implementation.MongoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,7 @@ import java.util.List;
 public class CertificateService extends MongoService<Certificate> implements ICertificateService {
 
     private final ICertificateRepository certificateRepository;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     public CertificateService(ICertificateRepository certificateRepository) {
@@ -30,7 +34,10 @@ public class CertificateService extends MongoService<Certificate> implements ICe
     @Override
     public Certificate findBySerialNumber(String serialNumber) {
         return certificateRepository.findBySerialNumber(serialNumber)
-                .orElseThrow(() -> new CertificateNotFoundException("Certificate with serial number " + serialNumber + " not found."));
+                .orElseThrow(() -> {
+                    logger.error("Certificate with serial number {} not found", serialNumber);
+                    return new CertificateNotFoundException("Certificate with serial number " + serialNumber + " not found.");
+                });
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.example.InfBezTim10.service.accountManagement.implementation;
 
+import com.example.InfBezTim10.controller.UserController;
 import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.service.accountManagement.ISendgridEmailService;
 import com.sendgrid.Method;
@@ -9,13 +10,15 @@ import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
 @Service
 public class SendgridEmailService implements ISendgridEmailService {
-
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     public void sendConfirmEmailMessage(User toUser, String code) {
         String fromEmail = "tim961495@gmail.com";
         String subject = "Confirm your email";
@@ -24,7 +27,9 @@ public class SendgridEmailService implements ISendgridEmailService {
 
         try {
             sendEmail(fromEmail, subject, toEmail, messageBody);
+            logger.info("Email successfully sent to user:{}!", toUser.getEmail());
         } catch (IOException ex) {
+            logger.error("Error while sending email!");
             ex.printStackTrace();
         }
     }
@@ -43,7 +48,9 @@ public class SendgridEmailService implements ISendgridEmailService {
 
         try {
             sendEmail(fromEmail, subject, toEmail, messageBody);
+            logger.info("Email successfully sent to user:{}!", toUser.getEmail());
         } catch (IOException ex) {
+            logger.error("Error while sending email!");
             ex.printStackTrace();
         }
     }
@@ -55,7 +62,9 @@ public class SendgridEmailService implements ISendgridEmailService {
         String messageBody =createAuthenticationEmailMessageBody(toUser.getName(), code);
         try {
             sendEmail(fromEmail, subject, toEmail, messageBody);
+            logger.info("Email successfully sent to user:{}!", toUser.getEmail());
         } catch (IOException ex) {
+            logger.error("Error while sending email!");
             ex.printStackTrace();
         }
     }

@@ -1,11 +1,14 @@
 package com.example.InfBezTim10.service.certificateManagement.implementation;
 
+import com.example.InfBezTim10.controller.UserController;
 import com.example.InfBezTim10.exception.certificate.CertificateValidationException;
 import com.example.InfBezTim10.model.certificate.Certificate;
 import com.example.InfBezTim10.model.certificate.CertificateStatus;
 import com.example.InfBezTim10.model.certificate.CertificateType;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateValidationService;
 import com.example.InfBezTim10.utils.CertificateFileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +30,7 @@ public class CertificateValidationService implements ICertificateValidationServi
 
     private final CertificateFileUtils certificateFileUtils;
     private final CertificateService certificateService;
-
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     @Autowired
     public CertificateValidationService(CertificateFileUtils certificateFileUtils, CertificateService certificateService) {
         this.certificateFileUtils = certificateFileUtils;
@@ -40,12 +43,14 @@ public class CertificateValidationService implements ICertificateValidationServi
             X509Certificate cert = certificateFileUtils.convertMultipartFileToX509Certificate(file);
             validate(cert.getSerialNumber().toString(16));
         } catch (IOException | CertificateException e) {
+            logger.error("Certificate copy is not valid!");
             throw new CertificateValidationException("Certificate copy is not valid!", e);
         }
     }
 
     private void validateCertificateChain(Certificate currCert, X509Certificate currX509Cert) throws CertificateValidationException, CertificateException, IOException {
         if (currCert == null) {
+            logger.error("Root certificate is not found!");
             throw new CertificateValidationException("Root certificate is not found!");
         }
 
@@ -56,6 +61,7 @@ public class CertificateValidationService implements ICertificateValidationServi
         }
 
         if (currCert.type == CertificateType.ROOT) {
+            logger.error("Root certificate is not trusted!");
             throw new CertificateValidationException("Root certificate is not trusted!");
         }
 
@@ -75,6 +81,7 @@ public class CertificateValidationService implements ICertificateValidationServi
             validateExpiration(cert);
             validateStatus(cert);
         } catch (IOException | CertificateException e) {
+            logger.error("Certificate cannot be validated!");
             throw new CertificateValidationException(e.getMessage(), e);
         }
     }
@@ -84,16 +91,19 @@ public class CertificateValidationService implements ICertificateValidationServi
         Date currentTime = Calendar.getInstance().getTime();
 
         if (cert.getValidFrom().after(currentTime)) {
+            logger.error("Certificate is not yet valid!");
             throw new CertificateValidationException("Certificate is not yet valid!");
         }
 
         if (cert.getValidTo().before(currentTime)) {
+            logger.error("Certificate is no longer valid!");
             throw new CertificateValidationException("Certificate is no longer valid!");
         }
     }
 
     private void validateStatus(Certificate cert) throws CertificateValidationException {
         if (cert.getStatus() != CertificateStatus.VALID) {
+            logger.error("Certificate is not valid!");
             throw new CertificateValidationException("Certificate is not valid!");
         }
     }
@@ -104,10 +114,12 @@ public class CertificateValidationService implements ICertificateValidationServi
             signature.initVerify(issuerCert.getPublicKey());
             signature.update(cert.getTBSCertificate());
             if (!signature.verify(cert.getSignature())) {
+                logger.error("Certificate signature is not valid!");
                 throw new CertificateValidationException("Certificate signature is not valid!");
             }
 
         } catch (SignatureException | InvalidKeyException | NoSuchAlgorithmException | CertificateException e) {
+            logger.error("Error occurred while validating certificate signature");
             throw new CertificateValidationException("Error occurred while validating certificate signature", e);
         }
     }

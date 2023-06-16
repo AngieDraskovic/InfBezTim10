@@ -9,6 +9,8 @@ import com.example.InfBezTim10.model.user.User;
 import com.example.InfBezTim10.repository.IUserRepository;
 import com.example.InfBezTim10.service.base.implementation.MongoService;
 import com.example.InfBezTim10.service.userManagement.IUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +25,7 @@ import java.util.Arrays;
 public class UserService extends MongoService<User> implements IUserService, UserDetailsService {
 
     private final IUserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
 
     @Autowired
@@ -32,8 +35,13 @@ public class UserService extends MongoService<User> implements IUserService, Use
 
     @Override
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found."));
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    logger.error("User with email {} not found.", email);
+                    return new UserNotFoundException("User with email " + email + " not found.");
+                });
     }
+
 
     @Override
     public boolean emailExists(String email) {
@@ -48,6 +56,7 @@ public class UserService extends MongoService<User> implements IUserService, Use
     public void isUserVerified(String email) {
         User user = findByEmail(email);
         if (user.getAccountStatus() == AccountStatus.PENDING_VERIFICATION) {
+            logger.warn("User account is not verified for email: {}", email);
             throw new UserNotVerifiedException("User account is not verified.");
         }
     }
