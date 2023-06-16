@@ -1,0 +1,287 @@
+2023-06-16 16:52:05.064 [main] DEBUG c.e.I.security.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2023-06-16 16:52:05.065 [main] DEBUG c.e.I.s.UserLoggingFilterConfig - Filter 'userLoggingFilterConfig' configured for use
+2023-06-16 16:52:20.795 [https-jsse-nio-8080-exec-9] INFO  c.e.I.controller.UserController - Received request to send password reset email to: dean@gmail.co
+2023-06-16 16:52:21.785 [https-jsse-nio-8080-exec-9] ERROR c.e.I.s.u.implementation.UserService - User with email dean@gmail.co not found.
+2023-06-16 16:52:21.786 [https-jsse-nio-8080-exec-9] WARN  c.e.I.controller.UserController - Error during password reset for email: dean@gmail.co
+com.example.InfBezTim10.exception.user.UserNotFoundException: User with email dean@gmail.co not found.
+	at com.example.InfBezTim10.service.userManagement.implementation.UserService.lambda$findByEmail$0(UserService.java:41)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.example.InfBezTim10.service.userManagement.implementation.UserService.findByEmail(UserService.java:39)
+	at com.example.InfBezTim10.service.accountManagement.implementation.PasswordResetService.sendEmail(PasswordResetService.java:59)
+	at com.example.InfBezTim10.controller.UserController.sendEmailForPasswordReset(UserController.java:168)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:207)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:152)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:884)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1081)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:974)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1011)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:537)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:631)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at com.example.InfBezTim10.security.UserLoggingFilterConfig.doFilterInternal(UserLoggingFilterConfig.java:33)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at com.example.InfBezTim10.security.JwtAuthFilter.doFilterInternal(JwtAuthFilter.java:45)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:352)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:268)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:166)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:493)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:390)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:894)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:1589)
+2023-06-16 16:53:54.219 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.0.Final
+2023-06-16 16:53:55.101 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2023-06-16 16:53:55.197 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 90 ms. Found 8 MongoDB repository interfaces.
+2023-06-16 16:53:55.471 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-06-16 16:53:55.490 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2023-06-16 16:53:55.869 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (https)
+2023-06-16 16:53:55.880 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["https-jsse-nio-8080"]
+2023-06-16 16:53:55.884 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2023-06-16 16:53:55.884 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.7]
+2023-06-16 16:53:56.014 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2023-06-16 16:53:56.016 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1664 ms
+2023-06-16 16:53:56.232 [main] INFO  org.mongodb.driver.client - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync|spring-boot", "version": "4.8.2"}, "os": {"type": "Windows", "name": "Windows 10", "architecture": "amd64", "version": "10.0"}, "platform": "Java/Oracle Corporation/19.0.1+10-21"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=majority, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='bezbednost', source='admin', password=<hidden>, mechanismProperties=<hidden>}, streamFactoryFactory=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.Jep395RecordCodecProvider@7d42404e]}, clusterSettings={hosts=[127.0.0.1:27017], srvHost=cluster0.qjqrdd6.mongodb.net, srvServiceName=mongodb, mode=MULTIPLE, requiredClusterType=REPLICA_SET, requiredReplicaSetName='atlas-s3m153-shard-0', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='30000 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, sendBufferSize=0}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, sendBufferSize=0}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=true, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=JAVA_LEGACY, serverApi=null, autoEncryptionSettings=null, contextProvider=null}
+2023-06-16 16:53:56.240 [cluster-ClusterId{value='648c778411e27046bb477d52', description='null'}-srv-cluster0.qjqrdd6.mongodb.net] INFO  org.mongodb.driver.cluster - Adding discovered server ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017 to client view of cluster
+2023-06-16 16:53:56.282 [cluster-ClusterId{value='648c778411e27046bb477d52', description='null'}-srv-cluster0.qjqrdd6.mongodb.net] INFO  org.mongodb.driver.cluster - Adding discovered server ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017 to client view of cluster
+2023-06-16 16:53:56.283 [cluster-ClusterId{value='648c778411e27046bb477d52', description='null'}-srv-cluster0.qjqrdd6.mongodb.net] INFO  org.mongodb.driver.cluster - Adding discovered server ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017 to client view of cluster
+2023-06-16 16:53:57.204 [cluster-ClusterId{value='648c778411e27046bb477d52', description='null'}-ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017, type=REPLICA_SET_PRIMARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=17, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=593496600, setName='atlas-s3m153-shard-0', canonicalAddress=ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017, hosts=[ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017], passives=[], arbiters=[], primary='ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017', tagSet=TagSet{[Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=7fffffff00000000000000b7, setVersion=7, topologyVersion=TopologyVersion{processId=648bf002f8534ac16ceda410, counter=6}, lastWriteDate=Fri Jun 16 16:53:53 CEST 2023, lastUpdateTimeNanos=885053054376900}
+2023-06-16 16:53:57.205 [cluster-ClusterId{value='648c778411e27046bb477d52', description='null'}-ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=17, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=594041300, setName='atlas-s3m153-shard-0', canonicalAddress=ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017, hosts=[ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017], passives=[], arbiters=[], primary='ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017', tagSet=TagSet{[Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=7, topologyVersion=TopologyVersion{processId=648beee0ccc4095691e5e4df, counter=4}, lastWriteDate=Fri Jun 16 16:53:53 CEST 2023, lastUpdateTimeNanos=885053058145700}
+2023-06-16 16:53:57.212 [cluster-ClusterId{value='648c778411e27046bb477d52', description='null'}-ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017] INFO  org.mongodb.driver.cluster - Discovered replica set primary ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017 with max election id 7fffffff00000000000000b7 and max set version 7
+2023-06-16 16:53:57.213 [cluster-ClusterId{value='648c778411e27046bb477d52', description='null'}-ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=17, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=602155200, setName='atlas-s3m153-shard-0', canonicalAddress=ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017, hosts=[ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017], passives=[], arbiters=[], primary='ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017', tagSet=TagSet{[Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=7, topologyVersion=TopologyVersion{processId=648bf1505dc2e2f8fad6150b, counter=3}, lastWriteDate=Fri Jun 16 16:53:53 CEST 2023, lastUpdateTimeNanos=885053066405100}
+2023-06-16 16:53:58.817 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@794cb26b, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@5b7ee56c, org.springframework.security.web.context.SecurityContextHolderFilter@4e8d9bb6, org.springframework.security.web.header.HeaderWriterFilter@16ccd2bc, org.springframework.web.filter.CorsFilter@311a0b3e, org.springframework.security.web.authentication.logout.LogoutFilter@485c84d7, com.example.InfBezTim10.security.JwtAuthFilter@35fa450f, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2673487b, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2d07aacc, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3de8f85c, org.springframework.security.web.session.SessionManagementFilter@4cd7e993, org.springframework.security.web.access.ExceptionTranslationFilter@6253e59a, org.springframework.security.web.access.intercept.AuthorizationFilter@3d53e876]
+2023-06-16 16:53:58.829 [main] WARN  o.s.s.c.a.web.builders.WebSecurity - You are asking Spring Security to ignore Mvc [pattern='/api/user/login', POST]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2023-06-16 16:53:58.829 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will not secure Mvc [pattern='/api/user/login', POST]
+2023-06-16 16:53:58.830 [main] WARN  o.s.s.c.a.web.builders.WebSecurity - You are asking Spring Security to ignore Mvc [pattern='/api/user/registration', POST]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2023-06-16 16:53:58.830 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will not secure Mvc [pattern='/api/user/registration', POST]
+2023-06-16 16:53:59.363 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["https-jsse-nio-8080"]
+2023-06-16 16:53:59.572 [main] INFO  o.a.t.u.net.NioEndpoint.certificate - Connector [https-jsse-nio-8080], TLS virtual host [_default_], certificate type [UNDEFINED] configured from [file:/C:/Users/Anastasija/Desktop/IBPROJEKAT/InfBezTim10/InfBezTim10/ssl/keystore.jks] using alias [localhost] and with trust store [null]
+2023-06-16 16:53:59.603 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (https) with context path ''
+2023-06-16 16:54:49.168 [https-jsse-nio-8080-exec-9] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-06-16 16:54:49.169 [https-jsse-nio-8080-exec-9] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2023-06-16 16:54:49.171 [https-jsse-nio-8080-exec-9] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2023-06-16 16:54:49.277 [https-jsse-nio-8080-exec-9] INFO  c.e.I.controller.UserController - Received request to send password reset email to: dean@gmail.co
+2023-06-16 16:54:50.206 [https-jsse-nio-8080-exec-9] ERROR c.e.I.s.u.implementation.UserService - User with email dean@gmail.co not found.
+2023-06-16 16:54:50.207 [https-jsse-nio-8080-exec-9] WARN  c.e.I.controller.UserController - Error during password reset for email: dean@gmail.co
+com.example.InfBezTim10.exception.user.UserNotFoundException: User with email dean@gmail.co not found.
+	at com.example.InfBezTim10.service.userManagement.implementation.UserService.lambda$findByEmail$0(UserService.java:41)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.example.InfBezTim10.service.userManagement.implementation.UserService.findByEmail(UserService.java:39)
+	at com.example.InfBezTim10.service.accountManagement.implementation.PasswordResetService.sendEmail(PasswordResetService.java:59)
+	at com.example.InfBezTim10.controller.UserController.sendEmailForPasswordReset(UserController.java:168)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:207)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:152)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:884)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1081)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:974)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1011)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:537)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:631)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at com.example.InfBezTim10.security.UserLoggingFilterConfig.doFilterInternal(UserLoggingFilterConfig.java:33)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:365)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at com.example.InfBezTim10.security.JwtAuthFilter.doFilterInternal(JwtAuthFilter.java:45)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:374)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:352)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:268)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:166)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:493)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:341)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:390)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:894)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:1589)
+2023-06-16 17:32:33.437 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.0.Final
+2023-06-16 17:32:34.755 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2023-06-16 17:32:34.873 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 110 ms. Found 8 MongoDB repository interfaces.
+2023-06-16 17:32:35.368 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'org.springframework.ws.config.annotation.DelegatingWsConfiguration' of type [org.springframework.ws.config.annotation.DelegatingWsConfiguration$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-06-16 17:32:35.404 [main] INFO  o.s.w.s.a.s.AnnotationActionEndpointMapping - Supporting [WS-Addressing August 2004, WS-Addressing 1.0]
+2023-06-16 17:32:36.371 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (https)
+2023-06-16 17:32:36.387 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["https-jsse-nio-8080"]
+2023-06-16 17:32:36.392 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2023-06-16 17:32:36.392 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.7]
+2023-06-16 17:32:36.540 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2023-06-16 17:32:36.542 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2926 ms
+2023-06-16 17:32:36.797 [main] INFO  org.mongodb.driver.client - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync|spring-boot", "version": "4.8.2"}, "os": {"type": "Windows", "name": "Windows 10", "architecture": "amd64", "version": "10.0"}, "platform": "Java/Oracle Corporation/19.0.1+10-21"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=majority, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='bezbednost', source='admin', password=<hidden>, mechanismProperties=<hidden>}, streamFactoryFactory=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.Jep395RecordCodecProvider@48268eec]}, clusterSettings={hosts=[127.0.0.1:27017], srvHost=cluster0.qjqrdd6.mongodb.net, srvServiceName=mongodb, mode=MULTIPLE, requiredClusterType=REPLICA_SET, requiredReplicaSetName='atlas-s3m153-shard-0', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='30000 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, sendBufferSize=0}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, sendBufferSize=0}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=true, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=JAVA_LEGACY, serverApi=null, autoEncryptionSettings=null, contextProvider=null}
+2023-06-16 17:32:36.806 [cluster-ClusterId{value='648c809447b31a1496d69936', description='null'}-srv-cluster0.qjqrdd6.mongodb.net] INFO  org.mongodb.driver.cluster - Adding discovered server ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017 to client view of cluster
+2023-06-16 17:32:36.857 [cluster-ClusterId{value='648c809447b31a1496d69936', description='null'}-srv-cluster0.qjqrdd6.mongodb.net] INFO  org.mongodb.driver.cluster - Adding discovered server ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017 to client view of cluster
+2023-06-16 17:32:36.860 [cluster-ClusterId{value='648c809447b31a1496d69936', description='null'}-srv-cluster0.qjqrdd6.mongodb.net] INFO  org.mongodb.driver.cluster - Adding discovered server ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017 to client view of cluster
+2023-06-16 17:32:38.028 [cluster-ClusterId{value='648c809447b31a1496d69936', description='null'}-ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017, type=REPLICA_SET_PRIMARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=17, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=607617600, setName='atlas-s3m153-shard-0', canonicalAddress=ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017, hosts=[ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017], passives=[], arbiters=[], primary='ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017', tagSet=TagSet{[Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=7fffffff00000000000000b7, setVersion=7, topologyVersion=TopologyVersion{processId=648bf002f8534ac16ceda410, counter=6}, lastWriteDate=Fri Jun 16 17:32:34 CEST 2023, lastUpdateTimeNanos=887373877871500}
+2023-06-16 17:32:38.030 [cluster-ClusterId{value='648c809447b31a1496d69936', description='null'}-ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=17, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=613695000, setName='atlas-s3m153-shard-0', canonicalAddress=ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017, hosts=[ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017], passives=[], arbiters=[], primary='ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017', tagSet=TagSet{[Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=7, topologyVersion=TopologyVersion{processId=648beee0ccc4095691e5e4df, counter=4}, lastWriteDate=Fri Jun 16 17:32:34 CEST 2023, lastUpdateTimeNanos=887373882224900}
+2023-06-16 17:32:38.030 [cluster-ClusterId{value='648c809447b31a1496d69936', description='null'}-ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=17, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=612193000, setName='atlas-s3m153-shard-0', canonicalAddress=ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017, hosts=[ac-yjkjdo3-shard-00-01.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017, ac-yjkjdo3-shard-00-00.qjqrdd6.mongodb.net:27017], passives=[], arbiters=[], primary='ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017', tagSet=TagSet{[Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=7, topologyVersion=TopologyVersion{processId=648bf1505dc2e2f8fad6150b, counter=3}, lastWriteDate=Fri Jun 16 17:32:34 CEST 2023, lastUpdateTimeNanos=887373882668300}
+2023-06-16 17:32:38.033 [cluster-ClusterId{value='648c809447b31a1496d69936', description='null'}-ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017] INFO  org.mongodb.driver.cluster - Discovered replica set primary ac-yjkjdo3-shard-00-02.qjqrdd6.mongodb.net:27017 with max election id 7fffffff00000000000000b7 and max set version 7
+2023-06-16 17:32:39.021 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@16a09809, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@69a73867, org.springframework.security.web.context.SecurityContextHolderFilter@350f18a6, org.springframework.security.web.header.HeaderWriterFilter@9e50283, org.springframework.web.filter.CorsFilter@749d7c01, org.springframework.security.web.authentication.logout.LogoutFilter@22aefae0, com.example.InfBezTim10.security.JwtAuthFilter@45d4421d, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@1c90029b, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@4db728df, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@1d3a03fe, org.springframework.security.web.session.SessionManagementFilter@ff5d4f1, org.springframework.security.web.access.ExceptionTranslationFilter@5613247e, org.springframework.security.web.access.intercept.AuthorizationFilter@21abda60]
+2023-06-16 17:32:39.026 [main] WARN  o.s.s.c.a.web.builders.WebSecurity - You are asking Spring Security to ignore Mvc [pattern='/api/user/login', POST]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2023-06-16 17:32:39.026 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will not secure Mvc [pattern='/api/user/login', POST]
+2023-06-16 17:32:39.026 [main] WARN  o.s.s.c.a.web.builders.WebSecurity - You are asking Spring Security to ignore Mvc [pattern='/api/user/registration', POST]. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+2023-06-16 17:32:39.027 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will not secure Mvc [pattern='/api/user/registration', POST]
+2023-06-16 17:32:39.371 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["https-jsse-nio-8080"]
+2023-06-16 17:32:39.598 [main] INFO  o.a.t.u.net.NioEndpoint.certificate - Connector [https-jsse-nio-8080], TLS virtual host [_default_], certificate type [UNDEFINED] configured from [file:/C:/Users/Anastasija/Desktop/IBPROJEKAT/InfBezTim10/InfBezTim10/ssl/keystore.jks] using alias [localhost] and with trust store [null]
+2023-06-16 17:32:39.622 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (https) with context path ''
+2023-06-16 17:32:55.184 [https-jsse-nio-8080-exec-9] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-06-16 17:32:55.184 [https-jsse-nio-8080-exec-9] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2023-06-16 17:32:55.186 [https-jsse-nio-8080-exec-9] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2023-06-16 17:32:55.252 [https-jsse-nio-8080-exec-9] INFO  c.e.I.controller.UserController - Received request to send password reset email to: anadra2001@gmail.com
+2023-06-16 17:32:57.693 [https-jsse-nio-8080-exec-9] INFO  c.e.I.controller.UserController - Email successfully sent to user:anadra2001@gmail.com!
+2023-06-16 17:32:57.693 [https-jsse-nio-8080-exec-9] INFO  c.e.I.controller.UserController - Password reset email sent to: anadra2001@gmail.com
+2023-06-16 17:33:21.803 [https-jsse-nio-8080-exec-10] INFO  c.e.I.controller.UserController - Received request to reset password for email: anadra2001@gmail.com
+2023-06-16 17:33:23.057 [https-jsse-nio-8080-exec-10] INFO  c.e.I.controller.UserController - Password reset successful for email: anadra2001@gmail.com
+2023-06-16 17:33:33.626 [https-jsse-nio-8080-exec-1] INFO  c.e.I.controller.UserController - Attempting to authenticate user: anadra2001@gmail.com
+2023-06-16 17:33:34.013 [https-jsse-nio-8080-exec-1] INFO  c.e.I.controller.UserController - User anadra2001@gmail.com authenticated successfully
+2023-06-16 17:33:34.270 [https-jsse-nio-8080-exec-1] INFO  c.e.I.controller.UserController - Recaptcha verification and user verification completed for user: anadra2001@gmail.com
+2023-06-16 17:33:39.472 [https-jsse-nio-8080-exec-3] INFO  c.e.I.controller.UserController - Sending sms for 2fa
+2023-06-16 17:33:40.366 [https-jsse-nio-8080-exec-3] INFO  c.e.I.controller.UserController - SMS has been sent to useranadra2001@gmail.com!
+2023-06-16 17:33:40.366 [https-jsse-nio-8080-exec-3] INFO  c.e.I.controller.UserController - 2FA code sent to user: anadra2001@gmail.com
+2023-06-16 17:33:54.744 [https-jsse-nio-8080-exec-5] INFO  c.e.I.controller.UserController - Received 2FA verification request for user: anadra2001@gmail.com
+2023-06-16 17:33:55.783 [https-jsse-nio-8080-exec-5] INFO  c.e.I.controller.UserController - 2FA verification successful for user: anadra2001@gmail.com
+2023-06-16 17:33:56.834 [https-jsse-nio-8080-exec-7] INFO  c.e.I.s.UserLoggingFilterConfig - User anadra2001@gmail.com accessed resource /api/certificate/count/all
+2023-06-16 17:33:56.960 [https-jsse-nio-8080-exec-3] INFO  c.e.I.s.UserLoggingFilterConfig - User anadra2001@gmail.com accessed resource /api/certificate/count/status
+2023-06-16 17:33:57.086 [https-jsse-nio-8080-exec-9] INFO  c.e.I.s.UserLoggingFilterConfig - User anadra2001@gmail.com accessed resource /api/certificate/paginated
+2023-06-16 17:33:57.090 [https-jsse-nio-8080-exec-9] INFO  c.e.I.controller.UserController - Getting all certificates paged
+2023-06-16 17:33:57.336 [https-jsse-nio-8080-exec-8] INFO  c.e.I.s.UserLoggingFilterConfig - User anadra2001@gmail.com accessed resource /api/certificate/count/status
+2023-06-16 17:33:57.358 [https-jsse-nio-8080-exec-1] INFO  c.e.I.s.UserLoggingFilterConfig - User anadra2001@gmail.com accessed resource /api/certificate/owner
+2023-06-16 17:33:57.360 [https-jsse-nio-8080-exec-1] INFO  c.e.I.controller.UserController - Getting all user certificates
+2023-06-16 17:33:57.474 [https-jsse-nio-8080-exec-2] INFO  c.e.I.s.UserLoggingFilterConfig - User anadra2001@gmail.com accessed resource /api/certificate/count/status
+2023-06-16 17:33:57.744 [https-jsse-nio-8080-exec-10] INFO  c.e.I.s.UserLoggingFilterConfig - User anadra2001@gmail.com accessed resource /api/certificate/count/status
+2023-06-16 17:33:57.754 [https-jsse-nio-8080-exec-6] INFO  c.e.I.s.UserLoggingFilterConfig - User anadra2001@gmail.com accessed resource /api/certificate/owner
+2023-06-16 17:33:57.754 [https-jsse-nio-8080-exec-6] INFO  c.e.I.controller.UserController - Getting all user certificates
+2023-06-16 17:33:58.137 [https-jsse-nio-8080-exec-5] INFO  c.e.I.s.UserLoggingFilterConfig - User anadra2001@gmail.com accessed resource /api/certificate/count/all

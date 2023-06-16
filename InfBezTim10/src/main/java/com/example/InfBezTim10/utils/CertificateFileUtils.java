@@ -1,10 +1,13 @@
 package com.example.InfBezTim10.utils;
 
+import com.example.InfBezTim10.controller.UserController;
 import com.example.InfBezTim10.exception.certificate.CertificateNotFoundException;
 import com.example.InfBezTim10.exception.certificate.CertificateReadException;
 import com.example.InfBezTim10.exception.certificate.PrivateKeyNotFoundException;
 import com.example.InfBezTim10.exception.certificate.PrivateKeyReadException;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -39,6 +42,8 @@ public class CertificateFileUtils {
         this.gridFsTemplate = gridFsTemplate;
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     public X509Certificate convertMultipartFileToX509Certificate(MultipartFile file) throws IOException, CertificateException {
         InputStream inputStream = file.getInputStream();
         CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
@@ -65,10 +70,11 @@ public class CertificateFileUtils {
 
                 return (X509Certificate) cf.generateCertificate(inputStream);
             } catch (IOException | CertificateException e) {
+                logger.error("Error reading the certificate!");
                 throw new CertificateReadException("Error reading the certificate!", e);
             }
         }
-
+        logger.error("Certificate is not found!");
         throw new CertificateNotFoundException("Certificate is not found!");
     }
 
@@ -91,10 +97,11 @@ public class CertificateFileUtils {
 
                 return keyFactory.generatePrivate(keySpec);
             } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+                logger.error("Error reading the private key!");
                 throw new PrivateKeyReadException("Error reading the private key", e);
             }
         }
-
+        logger.error("Private key is not found!");
         throw new PrivateKeyNotFoundException("Private key is not found!");
     }
 }

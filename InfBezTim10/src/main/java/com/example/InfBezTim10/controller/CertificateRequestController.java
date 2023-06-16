@@ -11,6 +11,8 @@ import com.example.InfBezTim10.model.certificate.CertificateRequest;
 import com.example.InfBezTim10.model.certificate.CertificateRequestStatus;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateRequestStatisticsService;
 import com.example.InfBezTim10.service.certificateManagement.implementation.CertificateRequestService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +28,7 @@ import java.util.stream.Collectors;
 public class CertificateRequestController {
     private final CertificateRequestService certificateRequestService;
     private final ICertificateRequestStatisticsService certificateRequestStatisticsService;
-
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     public CertificateRequestController(CertificateRequestService certificateRequestService, ICertificateRequestStatisticsService certificateRequestStatisticsService) {
         this.certificateRequestService = certificateRequestService;
         this.certificateRequestStatisticsService = certificateRequestStatisticsService;
@@ -35,11 +37,14 @@ public class CertificateRequestController {
     @PostMapping("/create-user")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> createUserCertificateRequest(@RequestBody CreateCertificateRequestDTO createCertificateRequestDTO, Principal principal) {
+        logger.info("Creating user certificate request for user: {}", principal.getName());
         try {
             CertificateRequest certificateRequest = CertificateRequestMapper.INSTANCE.createCertificateRequestDTOToCertificateRequest(createCertificateRequestDTO);
             certificateRequest.setSubjectUsername(principal.getName());
+            logger.info("Successfully created certificate request for user: {} ", principal.getName());
             return ResponseEntity.ok(certificateRequestService.createCertificateRequest(certificateRequest, "ROLE_USER", principal.getName()));
         } catch (CertificateGenerationException e) {
+            logger.error("Error while generating certificate: {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -47,21 +52,27 @@ public class CertificateRequestController {
     @PostMapping("/create-admin")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> createAdminCertificateRequest(@RequestBody CreateCertificateRequestDTO createCertificateRequestDTO, Principal principal) {
+        logger.info("Creating admin certificate request for user: {}", principal.getName());
         try {
             CertificateRequest certificateRequest = CertificateRequestMapper.INSTANCE.createCertificateRequestDTOToCertificateRequest(createCertificateRequestDTO);
             certificateRequest.setSubjectUsername(principal.getName());
             CertificateRequest certificateRequest1 = certificateRequestService.createCertificateRequest(certificateRequest, "ROLE_ADMIN", principal.getName());
+            logger.info("Successfully created admin certificate  request for user: {} ", principal.getName());
             return ResponseEntity.ok(certificateRequest1);
         } catch (CertificateGenerationException e) {
+            logger.error("Error while generating certificate: {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
     @PutMapping("/{requestId}/approve")
     public ResponseEntity<Certificate> approveCertificateRequest(@PathVariable String requestId, Principal principal) {
+        logger.info("Approving certificate request with ID: {} by user: {}", requestId, principal.getName());
         try {
+            logger.info("Succesfully approved certificate request with ID: {} by user: {}", requestId, principal.getName());
             return ResponseEntity.ok(certificateRequestService.approveCertificateRequest(requestId, principal.getName()));
         } catch (Exception e) {
+            logger.error("Error while approving certificate request: {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -72,6 +83,7 @@ public class CertificateRequestController {
             @RequestBody RejectionReasonDTO rejectionReasonDTO,
             Principal principal
     ) {
+        logger.info("Rejecting certificate request with ID: {} by user: {}, reason: {}", requestId, principal.getName(), rejectionReasonDTO.getReason());
         certificateRequestService.rejectCertificateRequest(requestId, principal.getName(), rejectionReasonDTO.getReason());
         return ResponseEntity.noContent().build();
     }
@@ -86,6 +98,7 @@ public class CertificateRequestController {
 
     @GetMapping("/outgoing-requests")
     public ResponseEntity<PaginatedResponse<CertificateRequestDTO>> getOutgoingRequestsForUser(Principal principal, Pageable pageable) {
+        logger.info("Getting all outgoing certificate requests");
         Page<CertificateRequest> certificateRequestsPage = certificateRequestService.getByUsername(principal.getName(), pageable);
         PaginatedResponse<CertificateRequestDTO> response = pageToPaginatedResponse(certificateRequestsPage, CertificateRequestMapper.INSTANCE::certificateRequestToCertificateRequestDTO);
 
@@ -94,6 +107,7 @@ public class CertificateRequestController {
 
     @GetMapping("/pending-incoming-requests")
     public ResponseEntity<PaginatedResponse<CertificateRequestDTO>> getIncomingRequestsForUser(Principal principal, Pageable pageable) {
+        logger.info("Getting all incoming certificate requests");
         Page<CertificateRequest> certificateRequestsPage = certificateRequestService.getByStatusAndUsername(CertificateRequestStatus.PENDING, principal.getName(), pageable);
         PaginatedResponse<CertificateRequestDTO> response = pageToPaginatedResponse(certificateRequestsPage, CertificateRequestMapper.INSTANCE::certificateRequestToCertificateRequestDTO);
 

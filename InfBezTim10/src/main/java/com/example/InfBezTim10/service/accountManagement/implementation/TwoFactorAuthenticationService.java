@@ -1,5 +1,6 @@
 package com.example.InfBezTim10.service.accountManagement.implementation;
 
+import com.example.InfBezTim10.controller.UserController;
 import com.example.InfBezTim10.exception.auth.TwoFactorCodeSendingException;
 import com.example.InfBezTim10.exception.user.IncorrectCodeException;
 import com.example.InfBezTim10.exception.auth.TwoFactorCodeNotFoundException;
@@ -11,6 +12,8 @@ import com.example.InfBezTim10.service.accountManagement.ITwillioService;
 import com.example.InfBezTim10.service.accountManagement.ITwoFactorAuthenticationService;
 import com.example.InfBezTim10.service.base.implementation.MongoService;
 import com.example.InfBezTim10.service.userManagement.IUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +32,7 @@ public class TwoFactorAuthenticationService extends MongoService<TwoFactorAuth> 
     private final ITwillioService twillioService;
     private final Random rand = new Random();
     private final ITwoFactorAuthRepository twoFactorAuthRepository;
-
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     public TwoFactorAuthenticationService(IUserService userService, ITwillioService twillioService,
                                           ISendgridEmailService sendgridEmailService, ITwoFactorAuthRepository twoFactorAuthRepository) {
         this.userService = userService;
@@ -58,8 +61,10 @@ public class TwoFactorAuthenticationService extends MongoService<TwoFactorAuth> 
 
         try {
             if (confirmationMethod.equalsIgnoreCase("email")) {
+                logger.info("Sending email for 2fa");
                 sendgridEmailService.sendTwoFactorAuthCodeMail(user, auth.getCode());
             } else if (confirmationMethod.equalsIgnoreCase("sms")) {
+                logger.info("Sending sms for 2fa");
                 twillioService.sendTwoFactorAuthCodeSMS(user, auth.getCode());
             }
         } catch (IOException e) {
@@ -75,6 +80,7 @@ public class TwoFactorAuthenticationService extends MongoService<TwoFactorAuth> 
     public void verifyCode(String userEmail, String code) {
         TwoFactorAuth auth = findByCode(code);
         if (!Objects.equals(auth.getUser().getEmail(), userEmail)) {
+            logger.error("Incorrect code for 2fa");
             throw new IncorrectCodeException("Incorrect code!");
         }
     }

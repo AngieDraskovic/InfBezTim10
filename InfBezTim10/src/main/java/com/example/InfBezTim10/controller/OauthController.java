@@ -11,6 +11,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,7 @@ public class OauthController {
     private final IOAuthService oAuthService;
 
     private final JwtUtil jwtUtil;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     public OauthController(IOAuthService oAuthService, JwtUtil jwtUtil) {
@@ -44,6 +47,7 @@ public class OauthController {
 
     @PostMapping(value = "/google")
     public ResponseEntity<AuthTokenDTO> google(@RequestBody OauthTokenDTO oauthTokenDTO) throws IOException {
+        logger.info("Received request for Google OAuth");
         final NetHttpTransport transport = new NetHttpTransport();
         final JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
         GoogleIdTokenVerifier.Builder verifier =
@@ -60,6 +64,7 @@ public class OauthController {
                 null
         );
         User loggedUser = oAuthService.processOAuthUser(payload.getSubject(), userData);
+        logger.info("OAuth user processed");
         AuthTokenDTO tokenDTO = login(loggedUser);
 
         return ResponseEntity.ok().body(tokenDTO);
@@ -71,6 +76,7 @@ public class OauthController {
         Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, Collections.singletonList(loggedUser.getAuthority()));
         SecurityContextHolder.getContext().setAuthentication(auth);
         String token = jwtUtil.generateToken(auth);
+        logger.info("Login successful for user: {}", loggedUser.getEmail());
         return new AuthTokenDTO(token, token);
     }
 }

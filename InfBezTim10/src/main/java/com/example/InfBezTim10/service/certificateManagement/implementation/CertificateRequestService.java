@@ -1,5 +1,6 @@
 package com.example.InfBezTim10.service.certificateManagement.implementation;
 
+import com.example.InfBezTim10.controller.UserController;
 import com.example.InfBezTim10.exception.certificate.CertificateGenerationException;
 import com.example.InfBezTim10.exception.NotFoundException;
 import com.example.InfBezTim10.exception.certificateRequest.*;
@@ -9,6 +10,8 @@ import com.example.InfBezTim10.service.certificateManagement.ICertificateGenerat
 import com.example.InfBezTim10.service.certificateManagement.ICertificateRequestService;
 import com.example.InfBezTim10.service.certificateManagement.ICertificateService;
 import com.example.InfBezTim10.service.base.implementation.MongoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +28,7 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
     private final ICertificateRequestRepository certificateRequestRepository;
     private final ICertificateService certificateService;
     private final ICertificateGeneratorService certificateGeneratorService;
-
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     @Autowired
     public CertificateRequestService(ICertificateRequestRepository certificateRequestRepository, ICertificateService certificateService, ICertificateGeneratorService certificateGeneratorService) {
         this.certificateRequestRepository = certificateRequestRepository;
@@ -58,6 +61,7 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         certificateRequest.setKeyUsageFlags(getKeyUsageFlags(certificateRequest.getCertificateType()));
 
         if (certificateRequest.getCertificateType() == CertificateType.ROOT && !userRole.equals("ROLE_ADMIN")) {
+            logger.warn("User can not get root certificate.");
             throw new IssuerCertificateNotFoundException("User can not get root certificate.");
         }
 
@@ -92,23 +96,28 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
 
     private void validateCertificateRequest(CertificateRequest certificateRequest, Certificate issuerCertificate) {
         if (issuerCertificate == null) {
+            logger.error("Issuer certificate not found.");
             throw new IssuerCertificateNotFoundException("Issuer certificate not found.");
         }
 
         if (issuerCertificate.getType() == CertificateType.END) {
+            logger.error("Cannot issue certificate based on end certificate.");
             throw new EndCertificateUsageException("Cannot issue certificate based on end certificate.");
         }
 
         if (issuerCertificate.getStatus() != CertificateStatus.VALID) {
+            logger.error("Cannot issue certificate based on on invalid certificate.");
             throw new InvalidCertificateIssuerException("Cannot issue certificate based on invalid certificate.");
         }
 
         Date currentDate = new Date();
         if (certificateRequest.getValidTo().before(currentDate) || certificateRequest.getValidTo().after(issuerCertificate.getValidTo())) {
+            logger.error("Issuer certificate end time should be after the new certificate end time.");
             throw new IssuerCertificateEndTimeException("Issuer certificate end time should be after the new certificate end time.");
         }
 
         if (issuerCertificate.getType().ordinal() > certificateRequest.getCertificateType().ordinal()) {
+            logger.error("Issuer certificate type should be higher or equal to the type of the certificate being issued.");
             throw new CertificateTypeHierarchyException("Issuer certificate type should be higher or equal to the type of the certificate being issued.");
         }
     }
@@ -144,6 +153,7 @@ public class CertificateRequestService extends MongoService<CertificateRequest> 
         Certificate certificate = certificateService.findBySerialNumber(request.getIssuerSN());
 
         if (!certificate.getUserEmail().equals(username)) {
+            logger.error("User is not authorized to approve or reject this certificate request.");
             throw new IllegalArgumentException("User is not authorized to approve or reject this certificate request");
         }
 

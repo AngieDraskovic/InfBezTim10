@@ -6,6 +6,8 @@ import com.example.InfBezTim10.exception.user.NotValidRecaptchaException;
 import com.example.InfBezTim10.service.userManagement.IRecaptchaService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,6 +25,7 @@ public class RecaptchaService implements IRecaptchaService {
 
     @Value("${google.recaptcha.secret}")
     private String recaptchaSecret;
+    private static final Logger logger = LoggerFactory.getLogger(RecaptchaService.class);
 
     @Override
     public void isResponseValid(String response) {
@@ -36,7 +39,10 @@ public class RecaptchaService implements IRecaptchaService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
         ResponseEntity<String> recaptchaResponseEntity =
                 restTemplate.postForEntity(GOOGLE_RECAPTCHA_VERIFY_URL, request, String.class);
+        String recaptchaResponseBody = recaptchaResponseEntity.getBody();
+        logger.debug("reCAPTCHA API response: {}", recaptchaResponseBody);
         if(!isSuccessfulResponse(recaptchaResponseEntity.getBody())){
+            logger.warn("Invalid reCAPTCHA token received.");
             throw new NotValidRecaptchaException("Invalid reCAPTCHA token!");
         }
     }
@@ -45,9 +51,10 @@ public class RecaptchaService implements IRecaptchaService {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(response);
-            System.out.println(jsonNode);
+            logger.debug("reCAPTCHA JSON response: {}", jsonNode);
             return jsonNode.has("success") && jsonNode.get("success").asBoolean();
         } catch (Exception e) {
+            logger.error("Error occurred while parsing reCAPTCHA response: {}", e.getMessage());
             throw new CustomException(e.getMessage());
         }
     }

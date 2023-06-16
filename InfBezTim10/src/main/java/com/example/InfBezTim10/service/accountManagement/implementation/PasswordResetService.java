@@ -14,6 +14,8 @@ import com.example.InfBezTim10.service.accountManagement.ISendgridEmailService;
 import com.example.InfBezTim10.service.accountManagement.ITwillioService;
 import com.example.InfBezTim10.service.userManagement.IUserService;
 import com.example.InfBezTim10.service.base.implementation.MongoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,6 +38,7 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
     private final PasswordEncoder passwordEncoder;
     private final Random rand = new Random();
     private static final Integer N = 4;
+    private static final Logger logger = LoggerFactory.getLogger(UserRegistrationService.class);
 
 
     @Autowired
@@ -77,15 +80,18 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
         User user = userService.findByEmail(userEmail);
         PasswordReset passwordReset = findByCode(resetPasswordDTO.getCode());
         if(!passwordReset.getUser().getEmail().equals(userEmail)){
+            logger.warn("Incorrect code!");
             throw new IncorrectCodeException("Incorrect code!");
         }
         if (!resetPasswordDTO.getNewPassword().equals(resetPasswordDTO.getNewPasswordConfirm())) {
+            logger.warn("Passwords do not match!");
             throw new PasswordDoNotMatchException("Passwords do not match!");
         }
 
         List<String> previousNPasswords = rotation(user);
         String newPassword = resetPasswordDTO.getNewPassword();
         if (previousNPasswords.stream().anyMatch(oldPassword -> passwordEncoder.matches(newPassword, oldPassword))) {
+            logger.warn("User cannot use one of their previous passwords!");
             throw new PreviousPasswordException("You cannot use one of your previous passwords!");
         }
         user.setPreviousPasswords(rotation(user));
@@ -98,18 +104,23 @@ public class PasswordResetService extends MongoService<PasswordReset> implements
     @Override
     public PasswordReset findByCode(String code) {
         return passwordResetRepository.findByCode(code)
-                .orElseThrow(() -> new PasswordResetNotFoundException("Password reset for code " + code + " does not exist!"));
+                .orElseThrow(() -> {
+                    logger.error("Password Reset with Code: {} does not exist!", code);
+                    return new PasswordResetNotFoundException("Password reset for code " + code + " does not exist!");
+                });
     }
 
     @Override
     public void renewPassword(String email, RenewPasswordDTO passwordDTO) {
         User user = userService.findByEmail(email);
         if (!passwordDTO.getNewPassword().equals(passwordDTO.getNewPasswordConfirm())) {
+            logger.warn("Passwords do not match!");
             throw new PasswordDoNotMatchException("Passwords do not match!");
         }
         List<String> previousNPasswords = rotation(user);
         String newPassword = passwordDTO.getNewPassword();
         if (previousNPasswords.stream().anyMatch(oldPassword -> passwordEncoder.matches(newPassword, oldPassword))) {
+            logger.warn("User cannot use one of their previous passwords!");
             throw new PreviousPasswordException("You cannot use one of your previous passwords!");
         }
         user.setPreviousPasswords(previousNPasswords);
