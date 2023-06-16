@@ -1,6 +1,8 @@
 package com.example.InfBezTim10.exception;
 
 import com.example.InfBezTim10.dto.ErrorDTO;
+import com.example.InfBezTim10.dto.ErrorResponseDTO;
+import com.example.InfBezTim10.exception.user.NotValidRecaptchaException;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,5 +48,15 @@ public class CustomExceptionHandler {
         ErrorDTO errorDTO = new ErrorDTO(HttpStatus.BAD_REQUEST, sb.toString());
 
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({NotValidRecaptchaException.class})
+    public ResponseEntity<ErrorResponseDTO> handleNotValidRecaptchaException(Exception exception) {
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.BAD_REQUEST.value(),
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

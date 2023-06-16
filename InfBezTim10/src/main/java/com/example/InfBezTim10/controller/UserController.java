@@ -181,6 +181,7 @@ public class UserController {
     public ResponseEntity<?> resetPassword(@Valid @PathVariable("email") String email, @RequestBody ResetPasswordDTO passwordDTO) {
         logger.info("Received request to reset password for email: {}", email);
         try {
+            this.recaptchaService.isResponseValid(passwordDTO.getRecaptchaToken());
             passwordResetService.resetPassword(email, passwordDTO);
             logger.info("Password reset successful for email: {}", email);
             return ResponseEntity.ok().build();

@@ -19,4 +19,6 @@ public class ResetPasswordDTO {
     private String newPasswordConfirm;
     @NotEmpty
     private String code;
+    @NotEmpty
+    private String recaptchaToken;
 }

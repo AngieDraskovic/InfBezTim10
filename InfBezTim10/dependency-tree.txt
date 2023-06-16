@@ -1,0 +1,183 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------------< com.example:InfBez >-------------------------
+[INFO] Building InfBez 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] The artifact org.hibernate:hibernate-core:jar:6.1.7.Final has been relocated to org.hibernate.orm:hibernate-core:jar:6.1.7.Final
+[INFO] 
+[INFO] --- dependency:3.3.0:tree (default-cli) @ InfBez ---
+[WARNING] The artifact org.hibernate:hibernate-core:jar:6.1.7.Final has been relocated to org.hibernate.orm:hibernate-core:jar:6.1.7.Final
+[INFO] com.example:InfBez:jar:0.0.1-SNAPSHOT
+[INFO] +- org.projectlombok:lombok:jar:1.18.26:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-data-mongodb:jar:3.0.5:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter:jar:3.0.5:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot:jar:3.0.5:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-autoconfigure:jar:3.0.5:compile
+[INFO] |  |  +- org.springframework.boot:spring-boot-starter-logging:jar:3.0.5:compile
+[INFO] |  |  |  +- ch.qos.logback:logback-classic:jar:1.4.6:compile
+[INFO] |  |  |  |  \- ch.qos.logback:logback-core:jar:1.4.6:compile
+[INFO] |  |  |  +- org.apache.logging.log4j:log4j-to-slf4j:jar:2.19.0:compile
+[INFO] |  |  |  |  \- org.apache.logging.log4j:log4j-api:jar:2.19.0:compile
+[INFO] |  |  |  \- org.slf4j:jul-to-slf4j:jar:2.0.7:compile
+[INFO] |  |  +- jakarta.annotation:jakarta.annotation-api:jar:2.1.1:compile
+[INFO] |  |  \- org.yaml:snakeyaml:jar:1.33:compile
+[INFO] |  +- org.mongodb:mongodb-driver-sync:jar:4.8.2:compile
+[INFO] |  |  +- org.mongodb:bson:jar:4.8.2:compile
+[INFO] |  |  \- org.mongodb:mongodb-driver-core:jar:4.8.2:compile
+[INFO] |  |     \- org.mongodb:bson-record-codec:jar:4.8.2:runtime
+[INFO] |  \- org.springframework.data:spring-data-mongodb:jar:4.0.4:compile
+[INFO] |     +- org.springframework:spring-tx:jar:6.0.7:compile
+[INFO] |     +- org.springframework:spring-expression:jar:6.0.7:compile
+[INFO] |     \- org.springframework.data:spring-data-commons:jar:3.0.4:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-web:jar:3.0.5:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-json:jar:3.0.5:compile
+[INFO] |  |  +- com.fasterxml.jackson.datatype:jackson-datatype-jdk8:jar:2.14.2:compile
+[INFO] |  |  \- com.fasterxml.jackson.module:jackson-module-parameter-names:jar:2.14.2:compile
+[INFO] |  +- org.springframework.boot:spring-boot-starter-tomcat:jar:3.0.5:compile
+[INFO] |  |  +- org.apache.tomcat.embed:tomcat-embed-core:jar:10.1.7:compile
+[INFO] |  |  \- org.apache.tomcat.embed:tomcat-embed-websocket:jar:10.1.7:compile
+[INFO] |  +- org.springframework:spring-web:jar:6.0.7:compile
+[INFO] |  |  \- io.micrometer:micrometer-observation:jar:1.10.5:compile
+[INFO] |  |     \- io.micrometer:micrometer-commons:jar:1.10.5:compile
+[INFO] |  \- org.springframework:spring-webmvc:jar:6.0.7:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-test:jar:3.0.5:test
+[INFO] |  +- org.springframework.boot:spring-boot-test:jar:3.0.5:test
+[INFO] |  +- org.springframework.boot:spring-boot-test-autoconfigure:jar:3.0.5:test
+[INFO] |  +- com.jayway.jsonpath:json-path:jar:2.7.0:test
+[INFO] |  |  \- net.minidev:json-smart:jar:2.4.10:compile
+[INFO] |  |     \- net.minidev:accessors-smart:jar:2.4.9:compile
+[INFO] |  |        \- org.ow2.asm:asm:jar:9.3:compile
+[INFO] |  +- jakarta.xml.bind:jakarta.xml.bind-api:jar:4.0.0:compile
+[INFO] |  |  \- jakarta.activation:jakarta.activation-api:jar:2.1.1:compile
+[INFO] |  +- org.assertj:assertj-core:jar:3.23.1:test
+[INFO] |  +- org.hamcrest:hamcrest:jar:2.2:test
+[INFO] |  +- org.junit.jupiter:junit-jupiter:jar:5.9.2:test
+[INFO] |  |  +- org.junit.jupiter:junit-jupiter-api:jar:5.9.2:test
+[INFO] |  |  |  +- org.opentest4j:opentest4j:jar:1.2.0:test
+[INFO] |  |  |  +- org.junit.platform:junit-platform-commons:jar:1.9.2:test
+[INFO] |  |  |  \- org.apiguardian:apiguardian-api:jar:1.1.2:test
+[INFO] |  |  +- org.junit.jupiter:junit-jupiter-params:jar:5.9.2:test
+[INFO] |  |  \- org.junit.jupiter:junit-jupiter-engine:jar:5.9.2:test
+[INFO] |  |     \- org.junit.platform:junit-platform-engine:jar:1.9.2:test
+[INFO] |  +- org.mockito:mockito-core:jar:4.8.1:compile
+[INFO] |  |  +- net.bytebuddy:byte-buddy-agent:jar:1.12.23:compile
+[INFO] |  |  \- org.objenesis:objenesis:jar:3.2:runtime
+[INFO] |  +- org.mockito:mockito-junit-jupiter:jar:4.8.1:test
+[INFO] |  +- org.skyscreamer:jsonassert:jar:1.5.1:test
+[INFO] |  |  \- com.vaadin.external.google:android-json:jar:0.0.20131108.vaadin1:test
+[INFO] |  +- org.springframework:spring-core:jar:6.0.7:compile
+[INFO] |  |  \- org.springframework:spring-jcl:jar:6.0.7:compile
+[INFO] |  +- org.springframework:spring-test:jar:6.0.7:test
+[INFO] |  \- org.xmlunit:xmlunit-core:jar:2.9.1:test
+[INFO] +- org.springframework.boot:spring-boot-starter-web-services:jar:3.0.5:compile
+[INFO] |  +- com.sun.xml.messaging.saaj:saaj-impl:jar:3.0.0:compile
+[INFO] |  |  +- jakarta.xml.soap:jakarta.xml.soap-api:jar:3.0.0:compile
+[INFO] |  |  +- org.jvnet.staxex:stax-ex:jar:2.1.0:compile
+[INFO] |  |  \- org.eclipse.angus:angus-activation:jar:2.0.0:runtime
+[INFO] |  +- jakarta.xml.ws:jakarta.xml.ws-api:jar:4.0.0:compile
+[INFO] |  +- org.springframework:spring-oxm:jar:6.0.7:compile
+[INFO] |  \- org.springframework.ws:spring-ws-core:jar:4.0.2:compile
+[INFO] |     \- org.springframework.ws:spring-xml:jar:4.0.2:compile
+[INFO] +- org.springframework:spring-context-support:jar:4.0.1.RELEASE:compile
+[INFO] |  +- org.springframework:spring-beans:jar:6.0.7:compile
+[INFO] |  \- org.springframework:spring-context:jar:6.0.7:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-security:jar:3.0.5:compile
+[INFO] |  +- org.springframework:spring-aop:jar:6.0.7:compile
+[INFO] |  +- org.springframework.security:spring-security-config:jar:6.0.2:compile
+[INFO] |  \- org.springframework.security:spring-security-web:jar:6.0.2:compile
+[INFO] +- com.github.mkopylec:recaptcha-spring-boot-starter:jar:2.3.1:compile
+[INFO] |  \- com.squareup.okhttp3:okhttp:jar:4.10.0:compile
+[INFO] |     +- com.squareup.okio:okio-jvm:jar:3.0.0:compile
+[INFO] |     |  +- org.jetbrains.kotlin:kotlin-stdlib-jdk8:jar:1.7.22:compile
+[INFO] |     |  |  \- org.jetbrains.kotlin:kotlin-stdlib-jdk7:jar:1.7.22:compile
+[INFO] |     |  \- org.jetbrains.kotlin:kotlin-stdlib-common:jar:1.7.22:compile
+[INFO] |     \- org.jetbrains.kotlin:kotlin-stdlib:jar:1.7.22:compile
+[INFO] |        \- org.jetbrains:annotations:jar:13.0:compile
+[INFO] +- jakarta.persistence:jakarta.persistence-api:jar:3.1.0:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-mail:jar:3.0.5:compile
+[INFO] |  \- org.eclipse.angus:jakarta.mail:jar:1.0.0:compile
+[INFO] +- com.google.code.gson:gson:jar:2.9.1:compile
+[INFO] +- org.hibernate.orm:hibernate-core:jar:6.1.7.Final:compile
+[INFO] |  +- jakarta.transaction:jakarta.transaction-api:jar:2.0.1:compile
+[INFO] |  +- org.jboss.logging:jboss-logging:jar:3.5.0.Final:compile
+[INFO] |  +- org.hibernate.common:hibernate-commons-annotations:jar:6.0.6.Final:runtime
+[INFO] |  +- org.jboss:jandex:jar:2.4.2.Final:runtime
+[INFO] |  +- com.fasterxml:classmate:jar:1.5.1:compile
+[INFO] |  +- net.bytebuddy:byte-buddy:jar:1.12.23:compile
+[INFO] |  +- org.glassfish.jaxb:jaxb-runtime:jar:4.0.2:runtime
+[INFO] |  |  \- org.glassfish.jaxb:jaxb-core:jar:4.0.2:runtime
+[INFO] |  |     +- org.glassfish.jaxb:txw2:jar:4.0.2:runtime
+[INFO] |  |     \- com.sun.istack:istack-commons-runtime:jar:4.1.1:runtime
+[INFO] |  +- jakarta.inject:jakarta.inject-api:jar:2.0.0:runtime
+[INFO] |  \- org.antlr:antlr4-runtime:jar:4.10.1:runtime
+[INFO] +- com.sendgrid:sendgrid-java:jar:4.4.1:compile
+[INFO] |  +- com.sendgrid:java-http-client:jar:4.1.0:compile
+[INFO] |  +- com.fasterxml.jackson.core:jackson-databind:jar:2.14.2:compile
+[INFO] |  +- com.fasterxml.jackson.core:jackson-annotations:jar:2.14.2:compile
+[INFO] |  \- com.fasterxml.jackson.core:jackson-core:jar:2.14.2:compile
+[INFO] +- org.hibernate.validator:hibernate-validator:jar:8.0.0.Final:compile
+[INFO] |  \- jakarta.validation:jakarta.validation-api:jar:3.0.2:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-validation:jar:3.0.5:compile
+[INFO] |  \- org.apache.tomcat.embed:tomcat-embed-el:jar:10.1.7:compile
+[INFO] +- io.jsonwebtoken:jjwt:jar:0.9.1:compile
+[INFO] +- javax.xml.bind:jaxb-api:jar:2.3.1:compile
+[INFO] |  \- javax.activation:javax.activation-api:jar:1.2.0:compile
+[INFO] +- javax.mail:mail:jar:1.4.7:compile
+[INFO] |  \- javax.activation:activation:jar:1.1:compile
+[INFO] +- org.mapstruct:mapstruct:jar:1.5.3.Final:compile
+[INFO] +- com.twilio.sdk:twilio:jar:8.19.0:compile
+[INFO] |  +- commons-codec:commons-codec:jar:1.15:compile
+[INFO] |  +- commons-io:commons-io:jar:2.7:compile
+[INFO] |  +- io.jsonwebtoken:jjwt-api:jar:0.11.2:compile
+[INFO] |  +- io.jsonwebtoken:jjwt-jackson:jar:0.11.2:compile
+[INFO] |  +- io.jsonwebtoken:jjwt-impl:jar:0.11.2:runtime
+[INFO] |  +- org.apache.httpcomponents:httpclient:jar:4.5.14:compile
+[INFO] |  +- org.apache.httpcomponents:httpcore:jar:4.4.16:compile
+[INFO] |  +- com.fasterxml.jackson.datatype:jackson-datatype-jsr310:jar:2.14.2:compile
+[INFO] |  \- org.slf4j:slf4j-api:jar:2.0.7:compile
+[INFO] +- org.bouncycastle:bcprov-jdk18on:jar:1.71:compile
+[INFO] +- javax.servlet:javax.servlet-api:jar:4.0.1:provided
+[INFO] +- org.bouncycastle:bcpkix-jdk18on:jar:1.71:compile
+[INFO] |  \- org.bouncycastle:bcutil-jdk18on:jar:1.71:compile
+[INFO] +- org.springframework.boot:spring-boot-starter-oauth2-client:jar:3.0.5:compile
+[INFO] |  +- org.springframework.security:spring-security-core:jar:6.0.2:compile
+[INFO] |  |  \- org.springframework.security:spring-security-crypto:jar:6.0.2:compile
+[INFO] |  +- org.springframework.security:spring-security-oauth2-client:jar:6.0.2:compile
+[INFO] |  |  +- org.springframework.security:spring-security-oauth2-core:jar:6.0.2:compile
+[INFO] |  |  \- com.nimbusds:oauth2-oidc-sdk:jar:9.43.1:compile
+[INFO] |  |     +- com.github.stephenc.jcip:jcip-annotations:jar:1.0-1:compile
+[INFO] |  |     +- com.nimbusds:content-type:jar:2.2:compile
+[INFO] |  |     \- com.nimbusds:lang-tag:jar:1.7:compile
+[INFO] |  \- org.springframework.security:spring-security-oauth2-jose:jar:6.0.2:compile
+[INFO] |     \- com.nimbusds:nimbus-jose-jwt:jar:9.24.4:compile
+[INFO] +- com.google.api-client:google-api-client:jar:2.2.0:compile
+[INFO] |  +- com.google.oauth-client:google-oauth-client:jar:1.34.1:compile
+[INFO] |  +- com.google.http-client:google-http-client-gson:jar:1.42.3:compile
+[INFO] |  +- com.google.guava:guava:jar:31.1-jre:compile
+[INFO] |  |  +- com.google.guava:failureaccess:jar:1.0.1:compile
+[INFO] |  |  +- com.google.guava:listenablefuture:jar:9999.0-empty-to-avoid-conflict-with-guava:compile
+[INFO] |  |  +- com.google.code.findbugs:jsr305:jar:3.0.2:compile
+[INFO] |  |  +- org.checkerframework:checker-qual:jar:3.12.0:compile
+[INFO] |  |  +- com.google.errorprone:error_prone_annotations:jar:2.11.0:compile
+[INFO] |  |  \- com.google.j2objc:j2objc-annotations:jar:1.3:compile
+[INFO] |  +- com.google.http-client:google-http-client-apache-v2:jar:1.42.3:compile
+[INFO] |  \- com.google.http-client:google-http-client:jar:1.42.3:compile
+[INFO] |     +- io.opencensus:opencensus-api:jar:0.31.1:compile
+[INFO] |     |  \- io.grpc:grpc-context:jar:1.27.2:compile
+[INFO] |     \- io.opencensus:opencensus-contrib-http-util:jar:0.31.1:compile
+[INFO] \- com.google.api-client:google-api-client-gson:jar:2.2.0:compile
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.550 s
+[INFO] Finished at: 2023-06-15T23:37:19+02:00
+[INFO] ------------------------------------------------------------------------
+[WARNING] 
+[WARNING] Plugin validation issues were detected in 2 plugin(s)
+[WARNING] 
+[WARNING]  * org.apache.maven.plugins:maven-dependency-plugin:3.3.0
+[WARNING]  * org.apache.maven.plugins:maven-site-plugin:3.12.1
+[WARNING] 
+[WARNING] For more or less details, use 'maven.plugin.validation' property with one of the values (case insensitive): [BRIEF, DEFAULT, VERBOSE]
+[WARNING] 

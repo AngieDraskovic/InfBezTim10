@@ -18,4 +18,5 @@ public class CreateCertificateRequestDTO {
     CertificateType certificateType;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+02:00")
     Date validTo;
+    String recaptchaToken;
 }

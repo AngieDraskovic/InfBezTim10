@@ -13,6 +13,7 @@ import com.example.InfBezTim10.service.certificateManagement.ICertificateRequest
 import com.example.InfBezTim10.service.certificateManagement.implementation.CertificateRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.example.InfBezTim10.service.userManagement.IRecaptchaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +30,12 @@ public class CertificateRequestController {
     private final CertificateRequestService certificateRequestService;
     private final ICertificateRequestStatisticsService certificateRequestStatisticsService;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-    public CertificateRequestController(CertificateRequestService certificateRequestService, ICertificateRequestStatisticsService certificateRequestStatisticsService) {
+    private final IRecaptchaService recaptchaService;
+
+    public CertificateRequestController(CertificateRequestService certificateRequestService, ICertificateRequestStatisticsService certificateRequestStatisticsService, IRecaptchaService recaptchaService) {
         this.certificateRequestService = certificateRequestService;
         this.certificateRequestStatisticsService = certificateRequestStatisticsService;
+        this.recaptchaService = recaptchaService;
     }
 
     @PostMapping("/create-user")
@@ -39,6 +43,7 @@ public class CertificateRequestController {
     public ResponseEntity<?> createUserCertificateRequest(@RequestBody CreateCertificateRequestDTO createCertificateRequestDTO, Principal principal) {
         logger.info("Creating user certificate request for user: {}", principal.getName());
         try {
+            recaptchaService.isResponseValid(createCertificateRequestDTO.getRecaptchaToken());
             CertificateRequest certificateRequest = CertificateRequestMapper.INSTANCE.createCertificateRequestDTOToCertificateRequest(createCertificateRequestDTO);
             certificateRequest.setSubjectUsername(principal.getName());
             logger.info("Successfully created certificate request for user: {} ", principal.getName());
@@ -54,6 +59,7 @@ public class CertificateRequestController {
     public ResponseEntity<?> createAdminCertificateRequest(@RequestBody CreateCertificateRequestDTO createCertificateRequestDTO, Principal principal) {
         logger.info("Creating admin certificate request for user: {}", principal.getName());
         try {
+            recaptchaService.isResponseValid(createCertificateRequestDTO.getRecaptchaToken());
             CertificateRequest certificateRequest = CertificateRequestMapper.INSTANCE.createCertificateRequestDTOToCertificateRequest(createCertificateRequestDTO);
             certificateRequest.setSubjectUsername(principal.getName());
             CertificateRequest certificateRequest1 = certificateRequestService.createCertificateRequest(certificateRequest, "ROLE_ADMIN", principal.getName());
